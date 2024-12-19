@@ -1,77 +1,115 @@
-# Untitled RPG
+# Untitled RPG Game Design Document
 
-## Game Loop
-1. Quest
+## Overview
+This document outlines the core gameplay mechanics, systems, and design principles for an RPG focused on moral choices, exploration, and tactical combat.
 
-The game loop begins with a moral dilemma, a puzzle with no correct answer, similar to the Trolley Problem. The player learns a bit about characters and the context of their dilemma, and about the environment. Some quests are optional, others are mandatory to progress.
+## Core Game Loop
 
-2. Exploration
+### 1. Quest Phase
+Each game loop begins with a moral dilemma presented to the player. These dilemmas, similar to the Trolley Problem, have no objectively correct answers. During this phase:
+- Players learn about relevant characters and context
+- The environment provides crucial background information
+- Some quests are mandatory for progression, while others remain optional
 
-The player is encourage to explore the environment to learn about the details of the puzzle and to discover potential solutions to it, either with items, other characters, or with knowledge.
+### 2. Exploration Phase
+Players explore the environment to:
+- Discover potential solutions through items, characters, or knowledge
+- Experience vivid, unique scenes that provide intrinsic rewards
+- Uncover branching quests that affect their playthrough
+- Access new rooms and zones as they progress
 
-This phase of the game loop should engage player with vivid descriptions of unique and interesting scenes, as exploration is inherently rewarding.
+During exploration, players:
+- Encounter enemies that engage the combat system
+- Manage resources that deplete through combat
+- Discover secrets that enhance engagement
+- Navigate survival elements that raise exploration stakes
 
-More quests can be discovered during exploration to branch the player's play-through. Rooms and their respective zones will also branch out and open up as the player progresses.
+### 3. Consequence Phase
+After resolving each dilemma, players experience:
+- Emotional payoff through narrative consequences
+- World modifications that affect:
+  - Quest availability and status
+  - Environmental changes
+  - Access to new areas
+- Character progression through:
+  - Item acquisition
+  - Stat improvements
+  - Environmental benefits
 
-The player will also face enemies, making them engage with the fighting system. The point of the fighting system is to deplete the player's resources, which they will have to replenish through exploration. More on the fighting system in its respective section. This is meant to add a survival element to the experience and to heighten the stakes of exploration.
+## Save System
 
-During exploration, there should be plenty of secrets to increase engagement.
+### Permanent Saves
+- Available after completing major quests
+- Accessible from any point in the game
+- Created automatically after character creation
 
-3. Consequences
+### Quick Saves
+- Single slot system
+- Only created when using "quit and save"
+- Lost when loading a permanent save
+- Cannot be loaded after death
+- Discourages decision reversal
 
-Upon deciding an action to the dilemma, the player will read through the consequences. This is the emotional payoff of the quest.
+## Combat System
 
-The quest should modify the world, either by advancing, revealing or ending other quests, or by opening, changing, or closing new environments to explore.
+### Core Mechanics
+Combat is turn-based and exclusively 1v1, featuring:
 
-Completing major quests will also let the player save their progress. More on that in the saving section.
+#### Attack Phase
+- Single round resolution
+- Victory requires higher attack points than opponent
+- Stats composing attack points are consumed until the opponent's death in this order:
+  1. Damaging items
+  2. 1/3 of remaining weapon durability
+  3. Grit
+  4. Health
+- Health is restored to pre-attack levels after victory
+- Grit is fully restored after victory
+- Weapon durability is not restored
+- Grape seeds provide revival option with:
+  - Full health restoration
+  - Unlimited usage per fight
 
-Completing quests also progresses the player's build by giving them items, stats, and environment changes related to the quest. More on that in the character build section.
+#### Inspection Phase
+- Enemy stats begin hidden
+- Initial inspection:
+  - Reveals enemy information
+  - Risks minor damage
+  - Includes dodge chance
+- Subsequent inspections:
+  - Free action
+  - No turn cost
+  - Encourages tactical planning
 
-## Saving
-Completing major quests will also let the player save their progress into a permanent save, which they can load to from any point in the game. This is to incentivize quest completion.
+#### Item Usage
+- Checkbox system for item selection
+- Multiple items allowed per turn
+- Consumable items destroyed after combat
+- Non-consumable items retained
+- Situational effectiveness rules
+- Overkill prevention system
 
-The player will be able to close the game and to re-open it at any time without losing progress through a "quit and save" button, which will lead the player back to the main menu and perform a quick-save. There is only one quick-save slot. The player will only be able to load saves from the main menu, and the player will be forced to quick-save in order to be able to load. This is to discourage loading a save to undo a moral decision.
+#### Escape Mechanics
+- Success based on dice roll
+- Higher success rate at low health
+- Special items can aid escape
+- Failed attempts risk damage
 
-The player will also be able to save permanently right after the character creation.
+#### Dodging
+- Not an option during combat
+- Has a chance to occur upon taking damage
+- While attacking, negates 1/3 of the opponent's attack points
+- While inspecting or escaping, negates all damage
+- Dodge chance improves with:
+  - Lower health
+  - Equipment bonuses
+  - Item bonuses
 
-Dying forces a quick-save, forcing the player the load a previous permanent save or to start over.
-
-## Game Over
-After a player dies, either as a result of a quest, losing a battle, or by being caught by a deadly tap, the game ends and the player will have to either start over or to load a previous permanent save, but they will not able to load a quick-save, as dying quick-saves.
-
-## Fighting
-Fighting is 1v1 and turn-based. 
-
-- Attack
-There can only be a single attack round which either results in victory or defeat. The player wins if he has more attack points than his enemy, and loses if he has less. More on that in the game over section. Once a fight is won, the player's health goes back to what it was before the final attack.
-
-But a player's game will not end upon death if they hold a grape seed. They will be asked consume one upon losing a fight, and come back alive with full health, but other stats (durability, grit) on the same level they were before death.
-
-There is no limit to how many grape seeds the player can use in a fight.
-
-- Inspect
-When an fight begins, the enemy's stats will be hidden from them. The player won't know if they have enough stats to win the fight. To reveal this information, they must inspect the opponent, which will leave them open to an small attack which will hurt them, but there is a chance for them to dodge it. Lower health and certain items or armor pieces can help with dodging.
-
-After inspecting once, the player can inspect for free without ending their turn, this is to remember the information that was written when they first inspected.
-
-This system incentivizes the player to read more of the game's text and enemy descriptions, and will inflict "chip damage" to highlight the game's survival aspect.
-
-Against weaker foes, the player could assume they will win the fight, and against stronger foes, the player could assume they will lose the fight. Saving them their inspect turn.
-
-- Items
-The player can mark which items they will use during their attack, inspect, talk, or run turn as a list of checkboxes. They can select as many items as they want, although the ones marked as consumable will be lost after the fight, and the ones which aren't marked as consumable will remain the player's inventory.
-
-Items with no effect during a particular action (e.g. throwing darts while talking) won't be used.
-
-Items that have an overkill effect (e.g. throwing 10 bombs while only 1 was needed to kill the enemy) will be lost, this is to discourage the frivolous use of items.
-
-- Run
-The player will be able to run away from enemies upon a dice roll. The player has a higher chance of succeeding the lower their health is. The player can also use specific items to help him escape, such as throwing sand in the enemy's eyes.
-
-Upon failing to escape, the player will be open to an small attack which will hurt them, but there is a chance for them to dodge it. Lower health and certain items or armor pieces can help with dodging.
-
-The player will fight the enemy again 
-
-## Items
-
-Items always show their short descriptions, but only show their long descriptions along with their stats upon either usage, or learning about it through dialogue or reading.
+## Item System
+- Persistent short descriptions
+- Long descriptions inform of stats and usage
+- Long descriptions hidden until revealed through:
+  - Active use
+  - NPC dialogue
+  - Environmental discovery
+- Dynamic stat display based on player knowledge
