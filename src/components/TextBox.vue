@@ -1,15 +1,30 @@
 <script setup lang="ts">
+import { ref } from "vue"
 import Fade from "./Fade.vue"
+
+const paragraphs = ref<string[]>([
+    "Lorem ipsum odor amet, consectetuer adipiscing elit.",
+    "Taciti turpis magna, vel habitasse mus mi consequat.",
+    "Rutrum lacus massa magna, senectus integer nulla ut."
+]);
+
+const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
+async function addLmaos() {
+    while (false) {
+        paragraphs.value.push("lmao!!");
+        await delay(1000);
+    }
+}
+addLmaos();
 </script>
 
 <template>
-    <div id="story-box">
+    <div id="story-box" ref="story-box">
         <Fade>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum consequat nunc ac ante porta, in tempor massa blandit. Praesent eu lorem in nulla facilisis congue at sit amet nunc. Donec vehicula magna at augue vehicula, vel placerat dui tempor.</p>
-            <p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-            <p>Fusce sed mauris vitae nisi convallis tincidunt. Maecenas vestibulum elit sit amet lorem tempus hendrerit. Nulla facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras eget dolor eget nisl tincidunt commodo.</p>
-            <p>Nam lacinia velit non felis convallis, eu tincidunt nisi porttitor. Nullam facilisis risus in lectus egestas, vel faucibus nunc fringilla. Suspendisse potenti. Proin feugiat libero eu ligula cursus, vitae ullamcorper sapien condimentum.</p>
-            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Integer non turpis ac nunc fermentum varius vitae non lorem. Vivamus vitae tellus in nisi venenatis tincidunt vel non metus.</p>
+            <template v-for="(text, index) in paragraphs" :key="index">
+                <p>{{ text }}</p>
+            </template>
         </Fade>
     </div>
 </template>
@@ -20,6 +35,7 @@ import Fade from "./Fade.vue"
     border-radius: 10px;
 
     padding: 10cqh 10cqw;
+    overflow-y: auto;
 
     flex: 1;
 /*     display: flex;
