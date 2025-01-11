@@ -1,5 +1,33 @@
-# Directive of where the
 spawn: main-room
+
+Entities:
+  joe-id:
+    name: "Joe Bob"
+    interaction: 1
+
+
+Interactions:
+  1:
+    # HTML supported. Implicit <p>. New lines and line breaks should pause the dialogue and
+    # wait for user input. The dialogue stops when the current node has no
+    # options available. Dialogue nodes with no text do not require user to go
+    # to the options, or in case of a lack of options, to end.
+    response: >
+      This is the end...
+      <br>
+      <b>I will burn the closet!</b>
+    events:
+      - burn-closet
+    reactions:
+      "I shall kill you for this!": 2
+      "Ok":
+        text: "Wait, you're really just gonna let me?"
+        options:
+          "Yeah":
+            text: "alright, then"
+  2:
+    text: "I have been killed..."
+    options:
 
 rooms:
   main-room:

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, reactive, h, onMounted } from "vue"
 import Fade from "./Fade.vue"
+import Test from "./Test.vue"
 
 const paragraphs = ref<string[]>([
     "Lorem ipsum odor amet, consectetuer adipiscing elit.",
@@ -8,20 +9,31 @@ const paragraphs = ref<string[]>([
     "Rutrum lacus massa magna, senectus integer nulla ut."
 ]);
 
-const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+const dynamic = reactive([
+    h(Test, null, () => "hello"),
+    h(Test, null, () => "hello2"),
+    h(Test, null, () => "hello3"),
+    h(Test, null, () => "hello4"),
+    h(Test, null, () => "hello5"),
+]);
 
-async function addLmaos() {
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+onMounted(async () => {
     while (false) {
-        paragraphs.value.push("lmao!!");
-        await delay(1000);
+        await sleep(2000);
+        dynamic.push(h(Test, null, () => "hello5"));
     }
-}
-addLmaos();
+})
+
 </script>
 
 <template>
     <div id="story-box" ref="story-box">
         <Fade>
+            <template v-for="(node, index) in dynamic"  :key="index">
+                <component :is="node"></component>
+            </template>
             <template v-for="(text, index) in paragraphs" :key="index">
                 <p>{{ text }}</p>
             </template>
@@ -41,4 +53,5 @@ addLmaos();
 /*     display: flex;
     flex-direction: column; */
 }
+
 </style>
