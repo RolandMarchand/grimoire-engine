@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, h, onMounted } from "vue"
 import Fade from "./Fade.vue"
-import Test from "./Test.vue"
 
 const paragraphs = ref<string[]>([
     "Lorem ipsum odor amet, consectetuer adipiscing elit.",
