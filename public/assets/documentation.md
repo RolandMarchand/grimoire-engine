@@ -66,7 +66,7 @@ updateRooms:
   "roomName":
     shortDescription: "New description"
     actions:
-      "New Action": "newEvent"
+      "New Action": "newEvent" # add or replace new events
       "Remove Action": null    # null removes existing actions
 ```
 

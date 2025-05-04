@@ -1,77 +1,81 @@
 import * as yaml from "js-yaml"
 import { z } from 'zod'
 
-type EventChain = Array<string | Event> | string | Event;
+type Event = {
+    print?: string;
+    chain?: EventChain,
+    go?: string,
+    check?: EventCheck,
+    callFunctions?: Record<string, Array<string> | undefined | null>,
+    updateRooms?: Array<Record<string, Room>> | Record<string, Room>
+}
+
+type EventChain = Array<Event | string> | Event | string;
 
 type EventCheck = {
     test: string,
-    arguments?: Array<string> | null
-    failed?: EventChain | null
+    arguments?: Array<string>,
+    failed?: EventChain,
 }
 
-type Event = {
-    print?: string | null,
-    chain?: EventChain | null,
-    go?: string | null,
-    check?: EventCheck | null,
-    callFunctions?: Map<string, Array<string> | null | undefined> | null
-};
+const Event: z.ZodType<Event> = z.lazy(() => z.object({
+    print: z.string().trim(),
+    chain: EventChain,
+    go: z.string().trim().min(1),
+    check: EventCheck,
+    callFunctions: z.record(
+        z.string().trim().min(1),
+        z.array(z.string().trim()).nullish()),
+    updateRooms: z.union([
+        z.array(z.record(z.string().trim().min(1), Room)),
+        z.record(z.string().trim().min(1), Room)
+    ]),
+}).strict().partial());
 
-type Room = {
-    shortDescription?: string | null,
-    longDescription?: string | null,
-    onEntry?: EventChain | null,
-    onExit?: EventChain | null,
-    actions?: Map<string, EventChain | null> | null
-};
+const EventChain: z.ZodType<EventChain> = z.lazy(() => z.union([
+    z.array(z.union([
+        z.string().trim(),
+        Event,
+    ])),
+    z.string().trim(),
+    Event,
+]));
 
-type Zone = {
-    rooms: Map<string, Room>,
-    events: Map<string, Event>,
-    spawn: string
-};
+const EventCheck: z.ZodType<EventCheck> = z.lazy(() => z.object({
+    test: z.string().trim().min(1),
+    arguments: z.array(z.string().trim().min(1)).optional(),
+    failed: EventChain.optional(),
+}).strict());
 
-const LazyEventChain: z.ZodType<EventChain> = z.lazy(() => EventChain);
-
-const EventCheck: z.ZodType<EventCheck> = z.object({
-    test: z.string().trim(),
-    arguments: z.array(z.string().trim()).nullish(),
-    failed: LazyEventChain.nullish()
-});
-
-const Event: z.ZodType<Event> = z.object({
-    print: z.string().trim().nullish(),
-    chain: LazyEventChain.nullish(),
-    go: z.string().trim().nullish(),
-    check: EventCheck.nullish(),
-    callFunctions: z.map(z.string().trim(), z.array(z.string().trim()).nullish()).nullish()
-});
-
-const EventChain: z.ZodType<EventChain> = 
-    z.union([z.array(z.union([z.string().trim(), Event])), z.string().trim(), Event]);
-
-const Room: z.ZodType<Room> = z.object({
+const Room = z.object({
     shortDescription: z.string().trim().nullish(),
     longDescription: z.string().trim().nullish(),
     onEntry: EventChain.nullish(),
     onExit: EventChain.nullish(),
-    actions: z.map(z.string().trim(), EventChain.nullable()).nullish()
+    actions: z.record(z.string().trim().min(1), EventChain.nullable()).nullish(),
+}).strict().partial();
+
+const Zone = z.object({
+    spawn: z.string().trim(),
+    rooms: z.record(z.string().trim().min(1), Room),
+    events: z.record(z.string().trim().min(1), Event),
+    // TODO: Improve the data validation.
+}).strict().required().refine(data => data.spawn in data.rooms, {
+    message: "Spawn room must exist in rooms",
+    path: ["spawn"]
 });
 
-const Zone: z.ZodType<Zone> = z.object({
-    rooms: z.map(z.string().trim(), Room),
-    events: z.map(z.string().trim(), Event),
-    spawn: z.string().trim()
-}).strict();
+type Zone = z.infer<typeof Zone>;
+type Room = z.infer<typeof Room>;
 
 try {
     let yamlText: string = "";
 
-    await fetch('/gdd/test.yml')
-    .then(response => response.text())
-    .then(fileContents => {
-        yamlText = fileContents;
-    });
+    await fetch('/assets/test.yml')
+	.then(response => response.text())
+	.then(fileContents => {
+            yamlText = fileContents;
+	});
 
     const zone = yaml.load(yamlText);
     const validZone = Zone.parse(zone);

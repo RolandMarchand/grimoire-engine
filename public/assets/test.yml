@@ -1,0 +1,55 @@
+spawn: cottage
+
+rooms:
+  cottage:
+    shortDescription: "A cozy stone cottage with a wooden door"
+    longDescription: "This small cottage has a thatched roof and warm fireplace. A sturdy wooden door leads outside to the garden."
+    actions:
+      "Check fireplace":
+        print: "The fire crackles warmly, keeping the cottage cozy"
+      "Exit to garden": "goToGarden"
+      "Look at mysterious book": "examineBook"
+
+  garden:
+    shortDescription: "An overgrown garden with stone walls"
+    longDescription: "Wild roses climb the ancient stone walls. A mysterious archway stands among the tangled vines, and a path leads back to the cottage."
+    onEntry: "gardenArrival"
+    actions:
+      "Examine archway": "checkArchway"
+      "Return inside": "returnToCottage"
+      "Pick roses":
+        check:
+          test: hasGloves
+          failed:
+            print: "The thorns look too sharp to handle safely"
+        print: "You carefully gather a bouquet of wild roses"
+
+events:
+  goToGarden:
+    print: "You step outside into the sunlit garden"
+    go: "garden"
+
+  returnToCottage:
+    print: "You head back into the warm cottage"
+    go: "cottage"
+
+  gardenArrival:
+    print: "A gentle breeze carries the scent of roses"
+
+  examineBook:
+    print: "You find an ancient spellbook covered in mysterious runes"
+    chain:
+      - print: "As you open it, some pages glow faintly"
+      - updateRooms:
+          garden:
+            actions:
+              "Cast spell": "castMagic"
+
+  checkArchway:
+    check:
+      test: hasSpellbook
+      failed:
+        print: "The archway seems dormant"
+    print: "The archway hums with magical energy"
+    chain:
+      - print: "Perhaps the right spell could activate it..."
