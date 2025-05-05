@@ -1,4 +1,6 @@
 <script setup lang="ts">
+    import { ref } from 'vue';
+
     const props = defineProps<{
         actions: Array<string>
     }>();
@@ -6,12 +8,25 @@
     const emit = defineEmits<{
         selected: [action: string]
     }>();
+
+    const isDisabled = ref(false);
+
+    const clickButton = (action: string): void => {
+        emit('selected', action)
+
+        isDisabled.value = true;
+        setTimeout(() => {
+            isDisabled.value = false;
+        }, 500);
+    }
 </script>
 
 <template>
     <div id="actions">
         <template v-for="(action, index) in actions" :key="index">
-            <button @click="emit('selected', action)">{{ action }}</button>
+            <button @click="clickButton(action)" :disabled="isDisabled">
+                {{ action }}
+            </button>
         </template>
     </div>
 </template>
@@ -40,7 +55,12 @@
     }
 
     button:active {
-        color: rgb(211, 214, 225);
+        color: rgb(159, 163, 179);
+        transition-duration: 0.1s;
+    }
+
+    button:disabled {
+        color: rgb(159, 163, 179);
         transition-duration: 0.1s;
     }
 </style>
