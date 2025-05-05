@@ -68,21 +68,32 @@ const Zone = z.object({
 type Zone = z.infer<typeof Zone>;
 type Room = z.infer<typeof Room>;
 
-try {
-    let yamlText: string = "";
+export async function getZone(): Promise<Zone | null> {
+    try {
+        let yamlText: string = "";
+    
+        await fetch('/assets/test.yml')
+        .then(response => response.text())
+        .then(fileContents => {
+                yamlText = fileContents;
+        });
+    
+        const zoneYAML = yaml.load(yamlText);
+        const zone = Zone.safeParse(zoneYAML);
+        if (zone.success) {
+            return zone.data;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            console.error('Validation errors:', error.errors);
+        } else {
+            console.error('YAML parsing error:', error);
+        }
 
-    await fetch('/assets/test.yml')
-	.then(response => response.text())
-	.then(fileContents => {
-            yamlText = fileContents;
-	});
-
-    const zone = yaml.load(yamlText);
-    const validZone = Zone.parse(zone);
-} catch (error) {
-    if (error instanceof z.ZodError) {
-        console.error('Validation errors:', error.errors);
-    } else {
-        console.error('YAML parsing error:', error);
+        return null;
     }
 }
+
+

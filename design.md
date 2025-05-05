@@ -1,3 +1,12 @@
+# TODO
+- Complete story ending for Librarians
+- Complete story ending for Cinderwoods
+- Complete story ending for Pariahs
+- Expand on weapon classes
+- Expand on moral dilemmas
+- Expand on map and environments
+- Expand on NPC personalities and stories
+
 # Untitled RPG Game Design Document
 
 ## Overview
@@ -62,13 +71,12 @@ Combat is turn-based and exclusively 1v1, featuring:
   1. Damaging items
   2. 1/3 of remaining weapon durability
   3. Grit
-  4. Health
+  4. Health & armor
 - 1/2 of the lost health is restored after victory
 - Grit is fully restored after victory
-- Weapon durability is not restored
-- Grape seeds provide revival option with:
-  - Full health restoration
-  - Unlimited usage per fight
+- Weapon and armor durability are not restored
+- If the player owns a grape seed, it will be consumed upon death during combat and the player will be revived out of combat
+- Armor transfers a percentage of health damage to armor durability
 
 #### Inspect
 - Enemy stats begin hidden
@@ -83,23 +91,21 @@ Combat is turn-based and exclusively 1v1, featuring:
 
 #### Item Usage
 - Checkbox system for item selection
-- Multiple items allowed per turn
+- Up to 4 items allowed
 - Consumable items destroyed after combat
 - Non-consumable items retained
-- Situational effectiveness rules
-- Overkill prevention system
 
 #### Escape
 - Success based on dice roll
 - Higher success rate at low health
 - Special items can aid escape
 - Failed attempts risk damage
-- Not leaving or re-entering the room will cause the fight to reoccur
+- Not immediately leaving the room or re-entering it will cause the fight to reoccur
 
 #### Dodge
 - Not an option during combat
 - Has a chance to occur upon taking damage
-- While attacking, negates 1/3 of the opponent's attack points
+- While attacking, negates 4/5 of the opponent's attack points
 - While inspecting or escaping, negates all damage
 - Dodge chance improves with:
   - Lower health
@@ -195,7 +201,7 @@ Combat is turn-based and exclusively 1v1, featuring:
 - High health
 - Low grit
 - Starts with armor and spear
-- Armor covers 2/3 of damage instead of 1/3
+- All armor doubles blocked damage and durability
 
 ### Librarian
 - Knowledge bounty hunter contracted by the Great Library
@@ -205,6 +211,7 @@ Combat is turn-based and exclusively 1v1, featuring:
 - Low grit
 - Starts with coat, pen, and lockpick
 - Items have 1/3 chance of not being consumed upon usage
+- Max 5 items used instead of four
 
 ## Pariah
 - Excommunicated reject of their home state
@@ -214,11 +221,6 @@ Combat is turn-based and exclusively 1v1, featuring:
 - Low grit
 - No starting equipment
 - No special skill
-
-## Stats
-
-### Health
-Health
 
 ## Development Phases
 
