@@ -56,6 +56,7 @@ const Room = z.object({
 }).strict().partial();
 
 const Zone = z.object({
+    version: z.number(),
     spawn: z.string().trim(),
     rooms: z.record(z.string().trim().min(1), Room),
     events: z.record(z.string().trim().min(1), Event),

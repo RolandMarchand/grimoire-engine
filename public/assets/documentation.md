@@ -9,10 +9,19 @@ This document describes the YAML configuration format for a data-driven text RPG
 | `spawn` | string | Name of the room the player will start the game in |
 | `rooms` | Record<string, Room> | Names and definitions of all the rooms |
 | `events` | Record<string, Room> | Names and definitions of all the events |
+| `version` | number | Version of the game API |
+
+## Version
+
+Contains the current game API version number.
+
+No future version of the API is planned, but this field remains for future compatibility.
 
 ## Rooms
 
 Each room in the `rooms` map is defined by the following properties:
+
+>**Note:** Each room identifier must be unique.
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -101,7 +110,10 @@ rooms:
 ## Examples
 
 ```yaml
+version: 1
+
 spawn: entrance
+
 rooms:
   entrance:
     shortDescription: "A dimly lit cave entrance"
@@ -110,6 +122,7 @@ rooms:
       "Enter cave": "enterCave"
       "Examine walls":
         print: "The walls are rough limestone"
+
 events:
   enterCave:
     check:
@@ -121,6 +134,8 @@ events:
 ```
 
 ```yaml
+version: 1
+
 spawn: cottage
 
 rooms:
