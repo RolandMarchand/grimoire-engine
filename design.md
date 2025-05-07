@@ -74,6 +74,7 @@ Combat is turn-based and exclusively 1v1, featuring:
   4. Health & armor
 - 1/2 of the lost health is restored after victory
 - Grit is fully restored after victory
+- 1/9 of remaining weapon durability is consumed
 - Weapon and armor durability are not restored
 - If the player owns a grape seed, it will be consumed upon death during combat and the player will be revived out of combat
 - Armor transfers a percentage of health damage to armor durability

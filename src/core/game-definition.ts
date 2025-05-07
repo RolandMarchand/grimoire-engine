@@ -79,12 +79,8 @@ export async function getZone(): Promise<Zone | null> {
         });
     
         const zoneYAML = yaml.load(yamlText);
-        const zone = Zone.safeParse(zoneYAML);
-        if (zone.success) {
-            return zone.data;
-        } else {
-            return null;
-        }
+        const zone = Zone.parse(zoneYAML);
+        return zone;
     } catch (error) {
         if (error instanceof z.ZodError) {
             console.error('Validation errors:', error.errors);

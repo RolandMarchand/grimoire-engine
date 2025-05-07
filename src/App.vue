@@ -4,7 +4,11 @@
     import TextBox from "./components/TextBox.vue";
     import ActionBar from "./components/ActionBar.vue";
 
+    import { getZone } from "./core/game-definition.ts";
+
     import { ref } from 'vue';
+
+    getZone();
 
     const paragraphs: Ref<Array<string>> = ref([
         "Lorem ipsum odor amet, consectetuer adipiscing elit.",
