@@ -17,14 +17,14 @@
     ]);
 
     const actions: Ref<Array<string>> = ref([
-        "Fuck",
-        "Mary",
-        "Kill",
-        "Nothing",
+        "Hello",
+        "Hi",
+        "Goodbye",
+        "[Nothing]",
     ]);
 
     function doAction(action: string): void {
-        if (action === "Nothing") {
+        if (action === "[Nothing]") {
             paragraphs.value.push("");
         } else {
             paragraphs.value.push(action);
