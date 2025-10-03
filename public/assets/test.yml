@@ -1,57 +1,146 @@
 version: 1
 
-spawn: cottage
+spawn: town_hall
 
 rooms:
-  cottage:
-    shortDescription: "A cozy stone cottage with a wooden door"
-    longDescription: "This small cottage has a thatched roof and warm fireplace. A sturdy wooden door leads outside to the garden."
+  town_hall:
+    shortDescription: "The Town Hall"
+    longDescription: "You stand in the grand town hall. The high ceilings echo with the sounds of daily business. Large wooden doors lead out to the bustling town square."
     actions:
-      "Check fireplace":
-        print: "The fire crackles warmly, keeping the cottage cozy"
-      "Exit to garden": "goToGarden"
-      "Look at mysterious book": "examineBook"
+      "Go to town": "goToTown"
 
-  garden:
-    shortDescription: "An overgrown garden with stone walls"
-    longDescription: "Wild roses climb the ancient stone walls. A mysterious archway stands among the tangled vines, and a path leads back to the cottage."
-    onEntry: "gardenArrival"
+  town:
+    shortDescription: "The Town Square"
+    longDescription: "The town square is alive with activity. Merchants call out their wares, children play near the fountain, and townsfolk go about their daily routines. You can see the general store to the east, your home to the west, and the old cemetery to the north. The town hall stands behind you to the south."
     actions:
-      "Examine archway": "checkArchway"
-      "Return inside": "returnToCottage"
-      "Pick roses":
-        check:
-          test: hasGloves
-          failed:
-            print: "The thorns look too sharp to handle safely"
-        print: "You carefully gather a bouquet of wild roses"
+      "Go to town hall": "goToTownHall"
+      "Go to store": "goToStore"
+      "Go home": "goHome"
+      "Go to cemetery": "goToCemetery"
+
+  store:
+    shortDescription: "The General Store"
+    longDescription: "Shelves stocked with goods line the walls. The shopkeeper stands behind the counter, organizing items."
+    actions:
+      "Talk to shopkeeper": "greetShopkeeper"
+      "Return to town": "returnToTown"
+
+  home:
+    shortDescription: "Your Home"
+    longDescription: "Your cozy home welcomes you with familiar warmth. Everything is just as you left it."
+    actions:
+      "Return to town": "returnToTown"
+
+  cemetery:
+    shortDescription: "The Old Cemetery"
+    longDescription: "Ancient gravestones stand in silent rows. The air is peaceful and still, broken only by the rustling of leaves."
+    actions:
+      "Return to town": "returnToTown"
 
 events:
-  goToGarden:
-    print: "You step outside into the sunlit garden"
-    go: "garden"
+  goToTown:
+    print: "You step out into the busy town square."
+    go: "town"
 
-  returnToCottage:
-    print: "You head back into the warm cottage"
-    go: "cottage"
+  goToTownHall:
+    print: "You walk back to the imposing town hall building."
+    go: "town_hall"
 
-  gardenArrival:
-    print: "A gentle breeze carries the scent of roses"
+  goToStore:
+    print: "You walk into the general store."
+    go: "store"
 
-  examineBook:
-    print: "You find an ancient spellbook covered in mysterious runes"
+  goHome:
+    print: "Ah home, I should get some rest."
+    go: "home"
+
+  goToCemetery:
+    print: "I haven't visited in a while. I guess the dead don't change."
+    go: "cemetery"
+
+  returnToTown:
+    print: "You make your way back to the town square."
+    go: "town"
+
+  greetShopkeeper:
+    print: "Good morning!"
     chain:
-      - print: "As you open it, some pages glow faintly"
+      - print: "The shopkeeper looks up with a warm smile. 'Good morning to you! What can I get for you today?'"
       - updateRooms:
-          garden:
+          store:
             actions:
-              "Cast spell": "castMagic"
+              "Ask about the sales": "askAboutSales"
+              "Ask about flowers": "askAboutFlowers"
+              "Nothing, thanks": "endConversation"
 
-  checkArchway:
-    check:
-      test: hasSpellbook
-      failed:
-        print: "The archway seems dormant"
-    print: "The archway hums with magical energy"
+  askAboutSales:
+    print: "I noticed some big sales going on today. What's the occasion?"
     chain:
-      - print: "Perhaps the right spell could activate it..."
+      - print: "The shopkeeper's eyes light up. 'Ah yes! There's a grand parade coming to town next week. The whole town is preparing for it!'"
+      - updateRooms:
+          store:
+            actions:
+              "Tell me more about the parade": "paradeDetails"
+              "Ask about flowers": "askAboutFlowers"
+              "That sounds wonderful": "endConversation"
+
+  paradeDetails:
+    print: "A parade? That sounds exciting! What's it for?"
+    chain:
+      - print: "The shopkeeper leans on the counter enthusiastically. 'It's the annual Harvest Festival parade! Musicians, dancers, decorated floats - the works! Been a tradition here for over fifty years.'"
+      - updateRooms:
+          store:
+            actions:
+              "Sounds like quite an event": "paradeResponse"
+              "Ask about flowers": "askAboutFlowers"
+              "I should get going": "endConversation"
+
+  paradeResponse:
+    print: "That does sound like quite an event. I'll have to make sure I'm there."
+    chain:
+      - print: "The shopkeeper nods approvingly. 'You absolutely should! It's the highlight of the season. Now, is there anything else I can help you with?'"
+      - updateRooms:
+          store:
+            actions:
+              "Ask about flowers": "askAboutFlowers"
+              "No, that's all": "endConversation"
+
+  askAboutFlowers:
+    print: "Do you know where I could get some nice flowers? I'd like to bring some to the cemetery."
+    chain:
+      - print: "The shopkeeper's expression softens. 'Ah, that's thoughtful of you. Unfortunately, the flower shop on Main Street closed down a few months ago. Old Mrs. Patterson retired and moved to live with her daughter.'"
+      - updateRooms:
+          store:
+            actions:
+              "That's too bad": "flowersResponse1"
+              "Is there anywhere else?": "flowersResponse2"
+
+  flowersResponse1:
+    print: "Oh, that's too bad. She must have had that shop for years."
+    chain:
+      - print: "The shopkeeper nods sadly. 'Over thirty years, actually. The whole town misses it. There are some wildflowers that grow near the cemetery gates, though. Not the same as a proper bouquet, but they're quite lovely.'"
+      - updateRooms:
+          store:
+            actions:
+              "Thank you for the suggestion": "endConversation"
+              "Ask about the sales": "askAboutSales"
+
+  flowersResponse2:
+    print: "Is there anywhere else in town I could get flowers?"
+    chain:
+      - print: "The shopkeeper thinks for a moment. 'Not really, I'm afraid. Your best bet would be the wildflowers near the cemetery gates. They bloom beautifully this time of year - daisies and black-eyed susans mostly.'"
+      - updateRooms:
+          store:
+            actions:
+              "I'll check those out, thanks": "endConversation"
+              "Ask about the sales": "askAboutSales"
+
+  endConversation:
+    print: "Thanks for your time!"
+    chain:
+      - print: "The shopkeeper waves cheerfully. 'Anytime! Come back soon!'"
+      - updateRooms:
+          store:
+            actions:
+              "Talk to shopkeeper": "greetShopkeeper"
+              "Return to town": "returnToTown"

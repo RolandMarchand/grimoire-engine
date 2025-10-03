@@ -1,52 +1,117 @@
 <script setup lang="ts">
+import StatusBar from "./components/StatusBar.vue";
+import TextBox from "./components/TextBox.vue";
+import ActionBar from "./components/ActionBar.vue";
 
-    import StatusBar from "./components/StatusBar.vue";
-    import TextBox from "./components/TextBox.vue";
-    import ActionBar from "./components/ActionBar.vue";
+import { getZone } from "./core/game-definition.ts";
+import type { GameState } from "./core/game-definition.ts";
+import { EventProcessor } from "./core/event-processor.ts";
+import { RoomNavigator } from "./core/room-navigator.ts";
 
-    import { getZone } from "./core/game-definition.ts";
+import { ref, onMounted, Ref } from "vue";
 
-    import { ref } from 'vue';
+const paragraphs: Ref<Array<string>> = ref([]);
+const actions: Ref<Array<string>> = ref([]);
 
-    getZone();
+const gameState: Ref<GameState> = ref({
+  currentRoom: "",
+  flag: {},
+  inventory: [],
+  data: {}
+});
 
-    const paragraphs: Ref<Array<string>> = ref([
-        "Lorem ipsum odor amet, consectetuer adipiscing elit.",
-        "Taciti turpis magna, vel habitasse mus mi consequat.",
-        "Rutrum lacus massa magna, senectus integer nulla ut."
-    ]);
+let zoneData: any = null;
+let eventProcessor: EventProcessor | null = null;
+let roomNavigator: RoomNavigator | null = null;
 
-    const actions: Ref<Array<string>> = ref([
-        "Hello",
-        "Hi",
-        "Goodbye",
-        "[Nothing]",
-    ]);
+const initializeEngine = async () => {
+  try {
+    const zone = await getZone();
 
-    function doAction(action: string): void {
-        if (action === "[Nothing]") {
-            paragraphs.value.push("");
-        } else {
-            paragraphs.value.push(action);
-        }
+    if (!zone) {
+      paragraphs.value.push("Error: Zone data is unavailable.");
+      return;
     }
+
+    zoneData = zone;
+
+    eventProcessor = new EventProcessor(zoneData);
+    roomNavigator = new RoomNavigator(gameState.value, zoneData, eventProcessor);
+
+    await loadRoom(zone.spawn);
+    
+  } catch (e) {
+    console.error("Error initializing engine:", e);
+    paragraphs.value.push("Error loading game.");
+  }
+};
+
+const loadRoom = async (roomName?: string) => {
+  if (!roomNavigator) {
+    console.error("RoomNavigator not initialized");
+    return;
+  }
+
+  try {
+    const targetRoom = roomName || gameState.value.currentRoom;
+    
+    if (!targetRoom) {
+      paragraphs.value.push("Error: No room specified.");
+      return;
+    }
+
+    const result = await roomNavigator.navigateToRoom(targetRoom);
+    
+    paragraphs.value.push(...result.messages);
+    
+    actions.value = result.actions;
+    
+  } catch (e) {
+    console.error("Error loading room:", e);
+    paragraphs.value.push("Error navigating to room.");
+  }
+};
+
+const doAction = async (action: string): Promise<void> => {
+  if (!roomNavigator) {
+    console.error("RoomNavigator not initialized");
+    paragraphs.value.push("Error: Game engine not ready.");
+    return;
+  }
+
+  try {
+    const result = await roomNavigator.executeAction(action);
+    
+    paragraphs.value.push(...result.messages);
+    
+    actions.value = result.actions;
+    
+  } catch (e) {
+    console.error("Error executing action:", e);
+    paragraphs.value.push("Error processing action.");
+  }
+};
+
+onMounted(() => {
+  initializeEngine();
+});
 </script>
 
 <template>
-    <main>
-        <TextBox :paragraphs="paragraphs"></TextBox>
-        <ActionBar :actions="actions" @selected="doAction"></ActionBar>
-    </main>
+  <main>
+    <TextBox :paragraphs="paragraphs"></TextBox>
+    <ActionBar :actions="actions" @selected="doAction"></ActionBar>
+  </main>
 </template>
 
 <style scoped>
-    main {
-        margin: 0;
-        width: 100%;
-        height: 100%;
-        padding: 0;
+main {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
 
-        display: flex;
-        flex-direction: column;
-    }
+  display: flex;
+  flex-direction: column;
+}
 </style>

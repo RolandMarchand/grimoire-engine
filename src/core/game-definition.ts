@@ -69,6 +69,13 @@ const Zone = z.object({
 type Zone = z.infer<typeof Zone>;
 type Room = z.infer<typeof Room>;
 
+export type GameState = {
+    currentRoom: string;
+    flag: Record<string, boolean>;
+    inventory: Array<string>;
+    data: Record<string, any>;
+}
+
 export async function getZone(): Promise<Zone | null> {
     try {
         let yamlText: string = "";
