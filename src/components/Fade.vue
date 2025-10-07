@@ -18,8 +18,11 @@
     opacity: 1;
 }
 
-#fade-div > .fade-enter-from,
-#fade-div > .fade-leave-to {
+#fade-div > .fade-enter-active {
+    opacity: 1;
+}
+
+#fade-div > .fade-enter-from {
     opacity: 0;
 }
 </style>
