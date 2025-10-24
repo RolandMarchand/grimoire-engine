@@ -2,6 +2,7 @@
 import StatusBar from "./components/StatusBar.vue";
 import TextBox from "./components/TextBox.vue";
 import ActionBar from "./components/ActionBar.vue";
+import SpeedControl from "./components/SpeedControl.vue";
 
 import { getZone } from "./core/game-definition.ts";
 import type { GameState } from "./core/game-definition.ts";
@@ -12,6 +13,9 @@ import { ref, onMounted, Ref } from "vue";
 
 const paragraphs: Ref<Array<string>> = ref([]);
 const actions: Ref<Array<string>> = ref([]);
+const showActions: Ref<boolean> = ref(false);
+
+const typewriterSpeed: Ref<number> = ref(10);
 
 const gameState: Ref<GameState> = ref({
   currentRoom: "",
@@ -23,6 +27,18 @@ const gameState: Ref<GameState> = ref({
 let zoneData: any = null;
 let eventProcessor: EventProcessor | null = null;
 let roomNavigator: RoomNavigator | null = null;
+
+const increaseSpeed = () => {
+  if (typewriterSpeed.value > 0) {
+    typewriterSpeed.value = Math.max(0, typewriterSpeed.value - 5);
+  }
+};
+
+const decreaseSpeed = () => {
+  if (typewriterSpeed.value < 100) {
+    typewriterSpeed.value = Math.min(100, typewriterSpeed.value + 5);
+  }
+};
 
 const initializeEngine = async () => {
   try {
@@ -60,6 +76,7 @@ const loadRoom = async (roomName?: string) => {
       return;
     }
 
+    showActions.value = false;
     const result = await roomNavigator.navigateToRoom(targetRoom);
     
     paragraphs.value.push(...result.messages);
@@ -80,6 +97,7 @@ const doAction = async (action: string): Promise<void> => {
   }
 
   try {
+    showActions.value = false;
     const result = await roomNavigator.executeAction(action);
     
     paragraphs.value.push(...result.messages);
@@ -92,6 +110,10 @@ const doAction = async (action: string): Promise<void> => {
   }
 };
 
+const onTypingComplete = () => {
+  showActions.value = true;
+};
+
 onMounted(() => {
   initializeEngine();
 });
@@ -99,8 +121,17 @@ onMounted(() => {
 
 <template>
   <main>
-    <TextBox :paragraphs="paragraphs"></TextBox>
-    <ActionBar :actions="actions" @selected="doAction"></ActionBar>
+    <SpeedControl 
+      :speed="typewriterSpeed"
+      @increaseSpeed="increaseSpeed"
+      @decreaseSpeed="decreaseSpeed"
+    />
+    <TextBox 
+      :paragraphs="paragraphs" 
+      :typewriterSpeed="typewriterSpeed"
+      @typingComplete="onTypingComplete"
+    />
+    <ActionBar v-if="showActions" :actions="actions" @selected="doAction" />
   </main>
 </template>
 

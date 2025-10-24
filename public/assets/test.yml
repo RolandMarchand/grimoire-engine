@@ -35,6 +35,7 @@ rooms:
     shortDescription: "The Old Cemetery"
     longDescription: "Ancient gravestones stand in silent rows. The air is peaceful and still, broken only by the rustling of leaves."
     actions:
+      "Examine tombstone": "examineStrangeTombstone"
       "Return to town": "returnToTown"
 
 events:
@@ -143,4 +144,74 @@ events:
           store:
             actions:
               "Talk to shopkeeper": "greetShopkeeper"
+              "Return to town": "returnToTown"
+
+  examineStrangeTombstone:
+    print: "You notice odd symbols on the tombstone. As you touch them, the ground rumbles..."
+    chain:
+      - print: "A hidden staircase opens beneath the tombstone!"
+      - addRoom:
+          underground_tombstone:
+            shortDescription: "Underground Tombstone"
+            longDescription: "A forgotten tombstone lies beneath the cemetery. Dusty shelves hold ancient artifacts."
+            actions:
+              "Examine artifacts": "examineArtifacts"
+              "Return to cemetery": "returnToCemetery"
+      - updateRooms:
+          cemetery:
+            actions:
+              "Enter the Tombstone": 
+                print: "You descend the stone stairs."
+                go: "underground_tombstone"
+              "Return to town": "returnToTown"
+  
+  examineArtifacts:
+    print: "You carefully examine the ancient artifacts on the shelves."
+    chain:
+      - print: "Among dusty relics and forgotten treasures, one item catches your eye - an ornate silver locket covered in strange markings."
+      - updateRooms:
+          underground_tombstone:
+            actions:
+              "Take the locket": "takeLocket"
+              "Leave it alone": "leaveLocket"
+              "Return to cemetery": "returnToCemetery"
+  takeLocket:
+    print: "You reach for the locket. As your fingers close around it, the markings begin to glow faintly."
+    chain:
+      - print: "Suddenly, the walls begin to shake violently! Dust and debris fall from the ceiling!"
+      - print: "You clutch the locket and run for the stairs as the tombstone begins to collapse behind you!"
+      - print: "You barely make it out as the entrance caves in with a thunderous crash. The staircase is completely buried now."
+      - removeRoom: "underground_tombstone"
+      - updateRooms:
+          cemetery:
+            longDescription: "Ancient gravestones stand in silent rows. The strange tombstone that once opened is now cracked and still. Whatever was beneath it is sealed forever. The air is peaceful and still, broken only by the rustling of leaves."
+            actions:
+              "Examine the locket": "examineLocket"
+              "Return to town": "returnToTown"
+      - go: "cemetery"
+
+  leaveLocket:
+    print: "Something about the locket feels wrong. You decide it's best to leave it undisturbed."
+    chain:
+      - print: "As you step back, the faint glow fades. Perhaps some things are meant to remain buried."
+      - updateRooms:
+          underground_tombstone:
+            actions:
+              "Return to cemetery": "returnToCemetery"
+
+  returnToCemetery:
+    print: "You carefully climb back up the stone stairs."
+    chain:
+      - print: "The fresh air is a relief after the musty tombstone. The cemetery seems peaceful again."
+      - go: "cemetery"
+
+  examineLocket:
+    print: "You pull out the mysterious locket and examine it in the daylight."
+    chain:
+      - print: "The strange markings have stopped glowing, but you can still feel a faint warmth emanating from it. Inside is a faded photograph of someone you don't recognize."
+      - print: "You return the locket to your pocket. Perhaps someone in town knows what this is."
+      - updateRooms:
+          cemetery:
+            actions:
+              "Examine the locket": "examineLocket"
               "Return to town": "returnToTown"

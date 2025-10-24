@@ -7,7 +7,7 @@ type Event = {
     go?: string,
     check?: EventCheck,
     callFunctions?: Record<string, Array<string> | undefined | null>,
-    updateRooms?: Array<Record<string, Room>> | Record<string, Room>
+    updateRooms?: Array<Record<string, Room>> | Record<string, Room>,
 }
 
 type EventChain = Array<Event | string> | Event | string;
@@ -29,6 +29,11 @@ const Event: z.ZodType<Event> = z.lazy(() => z.object({
     updateRooms: z.union([
         z.array(z.record(z.string().trim().min(1), Room)),
         z.record(z.string().trim().min(1), Room)
+    ]),
+    addRoom: z.record(z.string().trim().min(1), Room),
+    removeRoom: z.union([
+        z.string().trim().min(1),
+        z.array(z.string().trim().min(1))
     ]),
 }).strict().partial());
 
@@ -92,6 +97,9 @@ export async function getZone(): Promise<Zone | null> {
     } catch (error) {
         if (error instanceof z.ZodError) {
             console.error('Validation errors:', error.errors);
+            error.errors.forEach(err => {
+                console.error(`  - ${err.path.join('.')}: ${err.message}`);
+            });
         } else {
             console.error('YAML parsing error:', error);
         }

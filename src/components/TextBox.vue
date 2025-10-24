@@ -1,32 +1,43 @@
 <script setup lang="ts">
 import Fade from "./Fade.vue";
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed} from "vue";
 
 const props = defineProps<{
   paragraphs: Array<string>;
+  typewriterSpeed?: number;
+}>();
+
+const emit = defineEmits<{
+  typingComplete: []
 }>();
 
 const storyBox = ref<HTMLDivElement | null>(null);
 const displayedTexts = ref<Array<string>>([]);
 const isTyping = ref<boolean>(false);
 
-const typewriterSpeed = 10;
+const speed = computed(() => props.typewriterSpeed ?? 0);
 
-const scrollToBottom = () => {
-  if (storyBox.value) {
-    storyBox.value.scrollTo({
+const scrollToBottom = async () => {
+  setTimeout(() => {
+    storyBox.value?.scrollTo({
       top: storyBox.value.scrollHeight,
       behavior: "smooth",
     });
-  }
+  });
 };
 
 const typeWriter = async (text: string, index: number) => {
   displayedTexts.value.push("");
-  
+
+  if (speed.value === 0) {
+    displayedTexts.value[index] = text;
+    scrollToBottom();
+    return;
+  }
+
   for (let i = 0; i <= text.length; i++) {
     displayedTexts.value[index] = text.substring(0, i);
-    await new Promise(resolve => setTimeout(resolve, typewriterSpeed));
+    await new Promise(resolve => setTimeout(resolve, speed.value));
     scrollToBottom();
   }
 };
@@ -42,6 +53,7 @@ const processNewParagraphs = async () => {
   }
   
   isTyping.value = false;
+  emit('typingComplete');
 };
 
 watch(() => props.paragraphs.length, () => {
@@ -71,7 +83,7 @@ onMounted(() => {
 #story-box {
   background-color: rgba(2, 6, 23, 0.5);
 
-  padding: 10cqh 10cqw;
+  padding: 3cqh 10cqw;
   overflow-y: auto;
 
   flex: 1;
