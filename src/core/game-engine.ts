@@ -20,7 +20,6 @@ export class GameEngine {
     private _initialized: boolean = false;
 
     constructor() {
-        // Create reactive game state
         this._gameState = reactive<GameState>({
             currentRoom: '',
             flag: {},
