@@ -1,48 +1,30 @@
-import type { GameState } from "./game-definition";
-
-type Event = {
-    print?: string;
-    chain?: EventChain;
-    go?: string;
-    updateRooms?: Array<Record<string, Room>> | Record<string, Room>;
-    addRoom?: Record<string, Room>;
-    removeRoom?: string | Array<string>;
-};
-
-type EventChain = Array<Event | string> | Event | string;
-
-type Room = {
-    shortDescription?: string | null;
-    longDescription?: string | null;
-    onEntry?: EventChain | null;
-    onExit?: EventChain | null;
-    actions?: Record<string, EventChain | null> | null;
-};
-
-type Zone = {
-    version: number;
-    spawn: string;
-    rooms: Record<string, Room>;
-    events: Record<string, Event>;
-};
-
-type PendingChange = 
-  | { type: 'addRoom', roomName: string, roomData: Room }
-  | { type: 'removeRoom', roomName: string }
-  | { type: 'updateRoom', roomName: string, updates: Partial<Room> };
-
-export type EventResult = {
-    messages: Array<string>;
-    navigateTo?: string;
-    stateUpdated: boolean;
-};
+import type { 
+    GameState, 
+    Zone, 
+    Event, 
+    EventChain, 
+    EventResult, 
+    Room 
+} from './game-types';
+import { ConditionChecker } from './condition-checker';
+import { FunctionRegistry } from './function-registry';
 
 export class EventProcessor {
+    private gameState: GameState;
     private zoneData: Zone;
-    private pendingChanges: Array<PendingChange> = [];
+    private conditionChecker: ConditionChecker;
+    private functionRegistry: FunctionRegistry;
 
-    constructor(zoneData: Zone) {
+    constructor(
+        gameState: GameState, 
+        zoneData: Zone,
+        conditionChecker: ConditionChecker,
+        functionRegistry: FunctionRegistry
+    ) {
+        this.gameState = gameState;
         this.zoneData = zoneData;
+        this.conditionChecker = conditionChecker;
+        this.functionRegistry = functionRegistry;
     }
 
     async processEventChain(eventChain: EventChain): Promise<EventResult> {
@@ -51,7 +33,6 @@ export class EventProcessor {
             stateUpdated: false
         };
 
-        this.pendingChanges = [];
         const events = this.normalizeEventChain(eventChain);
 
         for (const event of events) {
@@ -65,8 +46,6 @@ export class EventProcessor {
                 break;
             }
         }
-
-        this.applyPendingChanges();
 
         return result;
     }
@@ -90,8 +69,25 @@ export class EventProcessor {
             return this.processSingleEvent(namedEvent);
         }
 
+        if (event.check) {
+            const checkPassed = await this.conditionChecker.evaluateCheck(event.check);
+            
+            if (!checkPassed) {
+                if (event.check.failed) {
+                    return this.processEventChain(event.check.failed);
+                }
+                return result;
+            }
+            
+        }
+
         if (event.print) {
             result.messages.push(event.print);
+        }
+
+        if (event.callFunctions) {
+            await this.functionRegistry.executeFunctions(event.callFunctions);
+            result.stateUpdated = true;
         }
 
         if (event.updateRooms) {
@@ -99,11 +95,13 @@ export class EventProcessor {
             result.stateUpdated = true;
         }
 
+        
         if (event.go) {
             result.navigateTo = event.go.trim();
             return result;
         }
 
+       
         if (event.chain) {
             const chainResult = await this.processEventChain(event.chain);
             result.messages.push(...chainResult.messages);
@@ -114,50 +112,25 @@ export class EventProcessor {
             }
         }
 
-        if (event.addRoom) {
-            this.executeAddRoom(event.addRoom);
-            result.stateUpdated = true;
-        }
-
-        if (event.removeRoom){
-            this.executeRemoveRoom(event.removeRoom);
-            result.stateUpdated = true;
-        }
-
         return result;
-    }
-
-    private executeAddRoom(roomToAdd: Record<string, Room>): void{
-        for (const [roomName, roomData] of Object.entries(roomToAdd)){
-            this.pendingChanges.push({
-                type: 'addRoom',
-                roomName,
-                roomData
-            });
-        }
-    }
-
-    private executeRemoveRoom(roomNames: string | Array<string>): void{
-        const namesToRemove = Array.isArray(roomNames) ? roomNames : [roomNames];
-
-        for (const roomName of namesToRemove){
-            this.pendingChanges.push({
-                type: 'removeRoom',
-                roomName
-            });
-        }
     }
 
     private executeUpdateRooms(updateRooms: Array<Record<string, Room>> | Record<string, Room>): void {
         const roomUpdates = Array.isArray(updateRooms) ? updateRooms : [updateRooms];
 
         for (const updateRecord of roomUpdates) {
-            for (const [roomName, updates] of Object.entries(updateRecord)) {
-                this.pendingChanges.push({
-                    type: 'updateRoom',
-                    roomName,
-                    updates
-                });
+            for (const [roomName, roomUpdates] of Object.entries(updateRecord)) {
+                if (!this.zoneData.rooms[roomName]) {
+                    console.warn(`Room "${roomName}" not found for update`);
+                    continue;
+                }
+
+                const existingRoom = this.zoneData.rooms[roomName];
+                
+                this.zoneData.rooms[roomName] = {
+                    ...existingRoom,
+                    ...roomUpdates
+                };
             }
         }
     }
@@ -171,40 +144,5 @@ export class EventProcessor {
 
     updateZoneData(newZoneData: Zone): void {
         this.zoneData = newZoneData;
-    }
-
-    private applyPendingChanges(): void {
-        for (const change of this.pendingChanges) {
-            switch (change.type) {
-                case 'addRoom':
-                    if (this.zoneData.rooms[change.roomName]) {
-                        console.warn(`Room "${change.roomName}" already exists, overwriting`);
-                    }
-                    this.zoneData.rooms[change.roomName] = change.roomData;
-                    break;
-
-                case 'removeRoom':
-                    if (!this.zoneData.rooms[change.roomName]) {
-                        console.warn(`Room "${change.roomName}" not found for removal`);
-                        break;
-                    }
-                    delete this.zoneData.rooms[change.roomName];
-                    break;
-
-                case 'updateRoom':
-                    if (!this.zoneData.rooms[change.roomName]) {
-                        console.warn(`Room "${change.roomName}" not found for update`);
-                        break;
-                    }
-                    const existingRoom = this.zoneData.rooms[change.roomName];
-                    this.zoneData.rooms[change.roomName] = {
-                        ...existingRoom,
-                        ...change.updates
-                    };
-                    break;
-            }
-        }
-
-        this.pendingChanges = [];
     }
 }

@@ -1,34 +1,10 @@
-import type { GameState } from "./game-definition.ts";
-import { EventProcessor } from "./event-processor.ts";
-
-type EventChain = Array<Event | string> | Event | string;
-
-type Event = {
-    print?: string;
-    chain?: EventChain;
-    go?: string;
-};
-
-type Room = {
-    shortDescription?: string | null;
-    longDescription?: string | null;
-    onEntry?: EventChain | null;
-    onExit?: EventChain | null;
-    actions?: Record<string, EventChain | null> | null;
-};
-
-type Zone = {
-    version: number;
-    spawn: string;
-    rooms: Record<string, Room>;
-    events: Record<string, Event>;
-};
-
-export type NavigationResult = {
-    messages: Array<string>;
-    actions: Array<string>;
-    roomChanged: boolean;
-};
+import type { 
+    GameState, 
+    Zone, 
+    NavigationResult, 
+    Room 
+} from './game-types';
+import { EventProcessor } from './event-processor';
 
 export class RoomNavigator {
     private gameState: GameState;
@@ -48,6 +24,7 @@ export class RoomNavigator {
             roomChanged: false
         };
 
+
         if (!this.zoneData.rooms[roomName]) {
             result.messages.push(`[Error: Room "${roomName}" does not exist]`);
             return result;
@@ -57,18 +34,22 @@ export class RoomNavigator {
         const currentRoom = this.zoneData.rooms[currentRoomName];
         const targetRoom = this.zoneData.rooms[roomName];
 
+        // Process onExit events from current room
         if (currentRoom?.onExit) {
             const exitResult = await this.eventProcessor.processEventChain(currentRoom.onExit);
             result.messages.push(...exitResult.messages);
 
+            // If onExit triggers a different navigation, follow that instead
             if (exitResult.navigateTo && exitResult.navigateTo !== roomName) {
                 console.warn(`onExit triggered navigation to ${exitResult.navigateTo}, aborting navigation to ${roomName}`);
                 return this.navigateToRoom(exitResult.navigateTo);
             }
         }
 
+
         this.gameState.currentRoom = roomName;
         result.roomChanged = true;
+
 
         if (targetRoom.shortDescription) {
             result.messages.push(targetRoom.shortDescription);
@@ -77,15 +58,18 @@ export class RoomNavigator {
             result.messages.push(targetRoom.longDescription);
         }
 
+        // Process onEntry events for new room
         if (targetRoom.onEntry) {
             const entryResult = await this.eventProcessor.processEventChain(targetRoom.onEntry);
             result.messages.push(...entryResult.messages);
 
+            // If onEntry triggers navigation, follow it
             if (entryResult.navigateTo) {
                 console.log(`onEntry triggered navigation to ${entryResult.navigateTo}`);
                 return this.navigateToRoom(entryResult.navigateTo);
             }
         }
+
 
         result.actions = this.getAvailableActions(roomName);
 
@@ -110,6 +94,7 @@ export class RoomNavigator {
             roomChanged: false
         };
 
+
         if (actionName === "[Nothing]") {
             result.messages.push("");
             result.actions = this.getAvailableActions(this.gameState.currentRoom);
@@ -118,6 +103,7 @@ export class RoomNavigator {
 
         const currentRoomName = this.gameState.currentRoom;
         const currentRoom = this.zoneData.rooms[currentRoomName];
+
 
         if (!currentRoom || !currentRoom.actions) {
             result.messages.push(`[Error: No actions available in current room]`);
@@ -132,14 +118,17 @@ export class RoomNavigator {
             return result;
         }
 
+
         if (actionEventChain === null) {
             result.messages.push("");
             result.actions = this.getAvailableActions(currentRoomName);
             return result;
         }
 
+
         const actionResult = await this.eventProcessor.processEventChain(actionEventChain);
         result.messages.push(...actionResult.messages);
+
 
         if (actionResult.navigateTo) {
             const navResult = await this.navigateToRoom(actionResult.navigateTo);
@@ -147,6 +136,7 @@ export class RoomNavigator {
             result.actions = navResult.actions;
             result.roomChanged = true;
         } else {
+
             result.actions = this.getAvailableActions(currentRoomName);
         }
 
