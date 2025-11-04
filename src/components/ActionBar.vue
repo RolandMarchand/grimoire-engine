@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import { ref } from 'vue';
-
+    import Fade from './Fade.vue';
     const props = defineProps<{
         actions: Array<string>
     }>();
@@ -22,13 +22,15 @@
 </script>
 
 <template>
-    <div id="actions">
-        <template v-for="(action, index) in actions" :key="index">
-            <button @click="clickButton(action)" :disabled="isDisabled">
-                {{ action }}
-            </button>
-        </template>
-    </div>
+    <Fade>
+        <div id="actions">
+            <template v-for="(action, index) in actions" :key="index">
+                <button @click="clickButton(action)" :disabled="isDisabled">
+                    {{ action }}
+                </button>
+            </template>
+        </div>
+    </Fade>
 </template>
 
 <style scoped>
@@ -48,10 +50,13 @@
         background-color: #0000;
         color: rgb(211, 214, 225);
         border: none;
+        border-radius: 8%;
+        cursor: pointer;
+        transition: text-shadow 0.3s ease-in-out;
     }
 
     button:hover {
-        color: rgb(255, 255, 255);
+        text-shadow: 0px 0px 8px rgb(66, 180, 251);
     }
 
     button:active {
@@ -62,5 +67,15 @@
     button:disabled {
         color: rgb(159, 163, 179);
         transition-duration: 0.1s;
+    }
+
+    @media (max-width: 768px) {
+        #actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+            align-items: center;
+            margin-top: 20px;
+        }
     }
 </style>

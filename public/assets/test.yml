@@ -160,11 +160,11 @@ events:
       - updateRooms:
           cemetery:
             actions:
-              "Enter the Tombstone": 
+              "Enter the Tombstone":
                 print: "You descend the stone stairs."
                 go: "underground_tombstone"
               "Return to town": "returnToTown"
-  
+
   examineArtifacts:
     print: "You carefully examine the ancient artifacts on the shelves."
     chain:
@@ -186,7 +186,6 @@ events:
           cemetery:
             longDescription: "Ancient gravestones stand in silent rows. The strange tombstone that once opened is now cracked and still. Whatever was beneath it is sealed forever. The air is peaceful and still, broken only by the rustling of leaves."
             actions:
-              "Examine the locket": "examineLocket"
               "Return to town": "returnToTown"
       - go: "cemetery"
 
@@ -194,10 +193,7 @@ events:
     print: "Something about the locket feels wrong. You decide it's best to leave it undisturbed."
     chain:
       - print: "As you step back, the faint glow fades. Perhaps some things are meant to remain buried."
-      - updateRooms:
-          underground_tombstone:
-            actions:
-              "Return to cemetery": "returnToCemetery"
+      - go: "cemetery"
 
   returnToCemetery:
     print: "You carefully climb back up the stone stairs."

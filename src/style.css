@@ -16,6 +16,11 @@ html, body {
   color-scheme: dark;
   color: #f8fafc;
   background: #0f172a;
+
+  background-image: url('./assets/Background.png');
+  background-size: cover;
+  background-position: center center;
+  
 }
 
 #app {
@@ -23,4 +28,6 @@ html, body {
   height: 100vh;
   margin: 0;
   padding: 0;
+  -webkit-backdrop-filter: brightness(5%);
+  backdrop-filter: brightness(50%);
 }

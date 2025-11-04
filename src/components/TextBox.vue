@@ -8,7 +8,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  typingComplete: []
+  typingComplete: [];
+  typingStart: []
 }>();
 
 const storyBox = ref<HTMLDivElement | null>(null);
@@ -45,6 +46,7 @@ const typeWriter = async (text: string, index: number) => {
 const processNewParagraphs = async () => {
   if (isTyping.value) return;
   isTyping.value = true;
+  emit('typingStart');
 
   while (displayedTexts.value.length < props.paragraphs.length) {
     const nextIndex = displayedTexts.value.length;
@@ -81,10 +83,13 @@ onMounted(() => {
 
 <style scoped>
 #story-box {
-  background-color: rgba(2, 6, 23, 0.5);
+  background-color: rgba(2, 6, 23, 0.4);
 
   padding: 3cqh 10cqw;
   overflow-y: auto;
+
+  height: 550px;
+  border-radius: 10px;
 
   flex: 1;
 
@@ -112,6 +117,12 @@ onMounted(() => {
   }
   50%, 100% {
     opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  #story-box {
+    height: 350px;
   }
 }
 </style>

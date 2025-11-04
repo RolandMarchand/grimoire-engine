@@ -14,8 +14,9 @@ import { ref, onMounted, Ref } from "vue";
 const paragraphs: Ref<Array<string>> = ref([]);
 const actions: Ref<Array<string>> = ref([]);
 const showActions: Ref<boolean> = ref(false);
+const isTyping: Ref<boolean> = ref(false);
 
-const typewriterSpeed: Ref<number> = ref(10);
+const typewriterSpeed: Ref<number> = ref(5);
 
 const gameState: Ref<GameState> = ref({
   currentRoom: "",
@@ -112,6 +113,11 @@ const doAction = async (action: string): Promise<void> => {
 
 const onTypingComplete = () => {
   showActions.value = true;
+  isTyping.value = false;
+};
+
+const onTypingStart = () => {
+  isTyping.value = true;
 };
 
 onMounted(() => {
@@ -126,23 +132,28 @@ onMounted(() => {
       @increaseSpeed="increaseSpeed"
       @decreaseSpeed="decreaseSpeed"
     />
-    <TextBox 
-      :paragraphs="paragraphs" 
-      :typewriterSpeed="typewriterSpeed"
-      @typingComplete="onTypingComplete"
-    />
-    <ActionBar v-if="showActions" :actions="actions" @selected="doAction" />
+    <div class="content">
+      <StatusBar 
+        :currentRoom="gameState.currentRoom"
+        :totalParagraphs="paragraphs.length"
+        :isTyping="isTyping"
+      />
+      <TextBox 
+        :paragraphs="paragraphs" 
+        :typewriterSpeed="typewriterSpeed"
+        @typingComplete="onTypingComplete"
+        @typingStart="onTypingStart"
+      />
+        <ActionBar v-if="showActions" :actions="actions" @selected="doAction" />
+    </div>
   </main>
 </template>
 
 <style scoped>
-main {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-
-  display: flex;
-  flex-direction: column;
+.content{
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 8%;
 }
 </style>
