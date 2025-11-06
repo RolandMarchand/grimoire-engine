@@ -25,7 +25,6 @@ onMounted(() => {
 
 <template>
   <div class="grimoire-background">
-    <!-- Glowing orbs -->
     <div 
       class="glow-orb" 
       style="width: 300px; height: 300px; background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%); top: 20%; left: 10%; animation-duration: 4s;">
@@ -41,7 +40,6 @@ onMounted(() => {
       style="width: 250px; height: 250px; background: radial-gradient(circle, rgba(109, 40, 217, 0.25) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); animation-duration: 6s; animation-delay: 2s;">
     </div>
 
-    <!-- Floating particles -->
     <div
       v-for="particle in particles"
       :key="particle.id"
@@ -55,7 +53,6 @@ onMounted(() => {
       }">
     </div>
 
-    <!-- Mystical runes -->
     <div class="rune" style="top: 15%; left: 20%; animation-duration: 3s;">✦</div>
     <div class="rune" style="top: 60%; left: 80%; animation-duration: 4s; animation-delay: 1s;">✧</div>
     <div class="rune" style="top: 40%; left: 15%; animation-duration: 5s; animation-delay: 2s;">⟡</div>

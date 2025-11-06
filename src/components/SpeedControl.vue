@@ -8,102 +8,111 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  increaseSpeed: [];
-  decreaseSpeed: [];
+  setSpeed: [speed: number];
 }>();
 
 const minSpeed = props.minSpeed ?? 0;
 const maxSpeed = props.maxSpeed ?? 100;
 
-const speedLabel = computed(() => {
-  return props.speed === 0 ? 'Instant' : `${props.speed}ms`;
+const speedPercentage = computed(() => {
+  const range = maxSpeed - minSpeed;
+  const normalized = maxSpeed - props.speed;
+  return Math.round((normalized / range) * 100);
 });
 
-const isAtMinSpeed = computed(() => props.speed <= minSpeed);
-const isAtMaxSpeed = computed(() => props.speed >= maxSpeed);
-
-const handleIncrease = () => {
-  if (!isAtMinSpeed.value) {
-    emit('increaseSpeed');
-  }
-};
-
-const handleDecrease = () => {
-  if (!isAtMaxSpeed.value) {
-    emit('decreaseSpeed');
-  }
+const handleSliderChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const percentage = parseInt(target.value);
+  const range = maxSpeed - minSpeed;
+  const newSpeed = maxSpeed - Math.round((percentage / 100) * range);
+  emit('setSpeed', newSpeed);
 };
 </script>
 
 <template>
-   <div class="speed">
+  <div class="speed">
     <div class="speed-controls">
-      <button 
-        @click="handleDecrease" 
-        :disabled="isAtMaxSpeed" 
-        class="speed-btn"
-        aria-label="Decrease typing speed"
-      >
-        -
-      </button>
-      <span class="speed-display">Speed: {{ speedLabel }}</span>
-      <button 
-        @click="handleIncrease" 
-        :disabled="isAtMinSpeed" 
-        class="speed-btn"
-        aria-label="Increase typing speed"
-      >
-        +
-      </button>
+      <label class="speed-label">Speed</label>
+      <input 
+        type="range" 
+        :value="speedPercentage"
+        @input="handleSliderChange"
+        min="0"
+        max="100"
+        class="speed-slider"
+        aria-label="Adjust typing speed"
+      />
+      <div class="speed-display">
+        <span class="speed-text">{{ speedPercentage }}%</span>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.speed{
+.speed {
   position: absolute;
   top: 1em;
   right: 1em;
 }
+
 .speed-controls {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  gap: 1em;
   padding: 0 1em;
 }
 
-.speed-btn {
+.speed-label {
   font-family: "Crimson Text", serif;
-  font-weight: 700;
-  font-size: 1em;
-  width: 2em;
-  height: 2em;
-  background-color: rgba(211, 214, 225, 0.1);
+  font-weight: 400;
+  font-size: 1.2em;
   color: rgb(211, 214, 225);
-  border: 2px solid rgb(211, 214, 225);
+}
+
+.speed-slider {
+  width: 150px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(211, 214, 225, 0.2);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+.speed-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
+  background: rgb(211, 214, 225);
   cursor: pointer;
   transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 2px solid rgb(211, 214, 225);
 }
 
-.speed-btn:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: rgb(255, 255, 255);
+.speed-slider::-webkit-slider-thumb:hover {
+  background: rgb(255, 255, 255);
   border-color: rgb(255, 255, 255);
-  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(66, 180, 251, 0.6);
+  transform: scale(1.15);
 }
 
-.speed-btn:active:not(:disabled) {
-  transform: scale(0.95);
-  background-color: rgba(159, 163, 179, 0.3);
+.speed-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgb(211, 214, 225);
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid rgb(211, 214, 225);
 }
 
-.speed-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
+.speed-slider::-moz-range-thumb:hover {
+  background: rgb(255, 255, 255);
+  border-color: rgb(255, 255, 255);
+  box-shadow: 0 0 8px rgba(66, 180, 251, 0.6);
+  transform: scale(1.15);
 }
 
 .speed-display {
@@ -111,7 +120,13 @@ const handleDecrease = () => {
   font-weight: 400;
   font-size: 1.2em;
   color: rgb(211, 214, 225);
-  min-width: 6em;
+  min-width: 3.5em;
   text-align: center;
+  padding: 0.25em 0.5em;
+  border-radius: 4px;
+}
+
+.speed-text {
+  user-select: none;
 }
 </style>

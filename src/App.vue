@@ -9,12 +9,13 @@ import type { GameState } from "./core/game-types.ts";
 import { GameEngine } from "./core/game-engine.ts";
 
 import { ref, onMounted, Ref, computed } from "vue";
+import AnimatedBackground from "./components/AnimatedBackground.vue";
 
 const paragraphs: Ref<Array<string>> = ref([]);
 const actions: Ref<Array<string>> = ref([]);
 const showActions: Ref<boolean> = ref(false);
 
-const typewriterSpeed: Ref<number> = ref(10);
+const typewriterSpeed: Ref<number> = ref(5);
 
 const gameEngine = new GameEngine();
 
@@ -26,16 +27,8 @@ const gameData = computed(() => gameEngine.gameState.data);
 
 
 
-const increaseSpeed = () => {
-  if (typewriterSpeed.value > 0) {
-    typewriterSpeed.value = Math.max(0, typewriterSpeed.value - 5);
-  }
-};
-
-const decreaseSpeed = () => {
-  if (typewriterSpeed.value < 100) {
-    typewriterSpeed.value = Math.min(100, typewriterSpeed.value + 5);
-  }
+const setSpeed = (speed: number) => {
+  typewriterSpeed.value = speed;
 };
 
 const initializeEngine = async () => {
@@ -101,11 +94,10 @@ onMounted(() => {
   <main>
    
     
-    
+    <AnimatedBackground/>
     <SpeedControl 
       :speed="typewriterSpeed"
-      @increaseSpeed="increaseSpeed"
-      @decreaseSpeed="decreaseSpeed"
+      @setSpeed="setSpeed"
     />
     <TextBox 
       :paragraphs="paragraphs" 
