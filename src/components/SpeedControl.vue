@@ -36,43 +36,48 @@ const handleDecrease = () => {
 </script>
 
 <template>
-  <div class="speed-controls">
-    <button 
-      @click="handleIncrease" 
-      :disabled="isAtMinSpeed" 
-      class="speed-btn"
-      aria-label="Increase typing speed"
-    >
-      +
-    </button>
-    <span class="speed-display">Speed: {{ speedLabel }}</span>
-    <button 
-      @click="handleDecrease" 
-      :disabled="isAtMaxSpeed" 
-      class="speed-btn"
-      aria-label="Decrease typing speed"
-    >
-      -
-    </button>
+   <div class="speed">
+    <div class="speed-controls">
+      <button 
+        @click="handleDecrease" 
+        :disabled="isAtMaxSpeed" 
+        class="speed-btn"
+        aria-label="Decrease typing speed"
+      >
+        -
+      </button>
+      <span class="speed-display">Speed: {{ speedLabel }}</span>
+      <button 
+        @click="handleIncrease" 
+        :disabled="isAtMinSpeed" 
+        class="speed-btn"
+        aria-label="Increase typing speed"
+      >
+        +
+      </button>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.speed{
+  position: absolute;
+  top: 1em;
+  right: 1em;
+}
 .speed-controls {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 1em;
-  padding: 1em 2em;
-  background-color: rgba(2, 6, 23, 0.3);
+  padding: 0 1em;
 }
 
 .speed-btn {
   font-family: "Crimson Text", serif;
   font-weight: 700;
-  font-size: 1.5em;
-  width: 2.5em;
-  height: 2.5em;
+  font-size: 1em;
+  width: 2em;
+  height: 2em;
   background-color: rgba(211, 214, 225, 0.1);
   color: rgb(211, 214, 225);
   border: 2px solid rgb(211, 214, 225);
@@ -106,7 +111,7 @@ const handleDecrease = () => {
   font-weight: 400;
   font-size: 1.2em;
   color: rgb(211, 214, 225);
-  min-width: 8em;
+  min-width: 6em;
   text-align: center;
 }
 </style>
