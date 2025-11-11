@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Fade from "./Fade.vue";
-import { ref, watch, onMounted, computed} from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 
 const props = defineProps<{
   paragraphs: Array<string>;
@@ -8,7 +8,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  typingComplete: []
+  typingComplete: [];
 }>();
 
 const storyBox = ref<HTMLDivElement | null>(null);
@@ -51,9 +51,9 @@ const processNewParagraphs = async () => {
     const nextText = props.paragraphs[nextIndex];
     await typeWriter(nextText, nextIndex);
   }
-  
+
   isTyping.value = false;
-  emit('typingComplete');
+  emit("typingComplete");
 };
 
 watch(() => props.paragraphs.length, () => {
@@ -67,51 +67,73 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="story-box" ref="storyBox">
-    <div class="story-content">
-      <Fade>
-        <p v-for="(text, index) in displayedTexts" :key="index">
-          {{ text }}<span v-if="index === displayedTexts.length - 1 && isTyping" class="cursor">|</span>
-        </p>
-      </Fade>
+    <div class="text-panel" ref="storyBox">
+        <div class="story-content">
+            <Fade>
+                <p v-for="(text, index) in displayedTexts" :key="index">
+                    {{ text }}
+                    <span v-if="index === displayedTexts.length - 1 && isTyping" class="cursor">|</span>
+                </p>
+            </Fade>
+        </div>
     </div>
-    <br />
-  </div>
 </template>
 
 <style scoped>
-#story-box {
-  background-color: rgba(2, 6, 23, 0.5);
+    .text-panel {
+        height: 100%;
+        overflow-y: auto;
+        padding: clamp(14px, 2cqw, 24px) clamp(16px, 3cqw, 32px);
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.20)), radial-gradient(1000px 600px at 50% 0%, rgba(34,211,238,0.04), transparent 60%), rgba(11,19,46,0.85);
+        border-radius: 10px;
+        scrollbar-width: none;
+    }
 
-  padding: 3cqh 10cqw;
-  overflow-y: auto;
+        .text-panel::-webkit-scrollbar {
+            display: none;
+        }
 
-  flex: 1;
+        .text-panel::before {
+            content: "";
+            position: absolute;
+            inset: 8px;
+            border-radius: 8px;
+            pointer-events: none;
+            box-shadow: inset 0 0 0 1px rgba(148,163,184,0.18);
+        }
 
-  font-family: "Crimson Text", serif;
-  font-weight: 400;
-  font-size: 1.5em;
+        .text-panel::after {
+            content: "";
+            position: absolute;
+            inset: 14px;
+            border-radius: 6px;
+            pointer-events: none;
+            box-shadow: inset 0 0 0 1px rgba(51,65,85,0.35);
+        }
 
-  /* For Firefox */
-  scrollbar-width: none;
+    .story-content {
+        font-family: "Crimson Text", serif;
+        font-size: clamp(1.05rem, 1.6cqw, 1.25rem);
+        font-weight: 400;
+        line-height: 1.65;
+        color: #e6edf6;
+    }
 
-  /* For Chrome, Safari, and Opera */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
+        .story-content p {
+            margin: 0 0 0.9em;
+        }
 
-.cursor {
-  animation: blink 1s infinite;
-  opacity: 1;
-}
+    .cursor {
+        animation: blink 1s infinite;
+    }
 
-@keyframes blink {
-  0%, 49% {
-    opacity: 1;
-  }
-  50%, 100% {
-    opacity: 0;
-  }
-}
+    @keyframes blink {
+        0%, 49% {
+            opacity: 1;
+        }
+
+        50%, 100% {
+            opacity: 0;
+        }
+    }
 </style>

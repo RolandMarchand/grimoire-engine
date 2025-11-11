@@ -5,9 +5,7 @@ import ActionBar from "./components/ActionBar.vue";
 import SpeedControl from "./components/SpeedControl.vue";
 
 import { getZone } from "./core/game-definition.ts";
-import type { GameState } from "./core/game-types.ts";
 import { GameEngine } from "./core/game-engine.ts";
-
 import { ref, onMounted, Ref, computed } from "vue";
 
 const paragraphs: Ref<Array<string>> = ref([]);
@@ -24,8 +22,6 @@ const flags = computed(() => gameEngine.gameState.flag);
 const currentRoom = computed(() => gameEngine.gameState.currentRoom);
 const gameData = computed(() => gameEngine.gameState.data);
 
-
-
 const increaseSpeed = () => {
   if (typewriterSpeed.value > 0) {
     typewriterSpeed.value = Math.max(0, typewriterSpeed.value - 5);
@@ -41,19 +37,14 @@ const decreaseSpeed = () => {
 const initializeEngine = async () => {
   try {
     const zone = await getZone();
-
     if (!zone) {
       paragraphs.value.push("Error: Zone data is unavailable.");
       return;
     }
 
-
     const result = await gameEngine.initializeGame(zone);
-    
-
     paragraphs.value.push(...result.messages);
     actions.value = result.actions;
-    
   } catch (e) {
     console.error("Error initializing engine:", e);
     paragraphs.value.push("Error loading game.");
@@ -63,18 +54,9 @@ const initializeEngine = async () => {
 const doAction = async (action: string): Promise<void> => {
   try {
     showActions.value = false;
-    
-
     const result = await gameEngine.executeAction(action);
-    
-
     paragraphs.value.push(...result.messages);
-    
-  
     actions.value = result.actions;
-    
-
-    
   } catch (e) {
     console.error("Error executing action:", e);
     paragraphs.value.push("Error processing action.");
@@ -85,57 +67,38 @@ const onTypingComplete = () => {
   showActions.value = true;
 };
 
-const formatItemName = (item: string) => {
-  return item
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
-
 onMounted(() => {
   initializeEngine();
 });
 </script>
 
 <template>
-  <main>
-   
-    
-    
-    <SpeedControl 
-      :speed="typewriterSpeed"
-      @increaseSpeed="increaseSpeed"
-      @decreaseSpeed="decreaseSpeed"
-    />
-    <TextBox 
-      :paragraphs="paragraphs" 
-      :typewriterSpeed="typewriterSpeed"
-      @typingComplete="onTypingComplete"
-    />
-    <ActionBar v-if="showActions" :actions="actions" @selected="doAction" />
-  </main>
+    <main class="app-shell">
+        <section class="app-frame">
+
+            <!-- Top bar for controls -->
+            <div class="toolbar">
+                <SpeedControl :speed="typewriterSpeed"
+                              @increaseSpeed="increaseSpeed"
+                              @decreaseSpeed="decreaseSpeed" />
+            </div>
+
+            <!-- Middle: Dialogue -->
+            <div class="dialogue-card">
+                <TextBox :paragraphs="paragraphs"
+                         :typewriterSpeed="typewriterSpeed"
+                         @typingComplete="onTypingComplete" />
+            </div>
+
+            <!-- Bottom: Actions -->
+            <div class="actions-row">
+                <ActionBar v-if="showActions" :actions="actions" @selected="doAction" />
+            </div>
+
+        </section>
+    </main>
 </template>
 
 <style scoped>
-main {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-
-  display: flex;
-  flex-direction: column;
-}
-
-
-
-
-
-.flag-item, .data-item {
-  display: block;
-  margin-left: 10px;
-  color: #0f0;
-}
-
-
+    /* Minimal — layout handled in style.css */
 </style>
