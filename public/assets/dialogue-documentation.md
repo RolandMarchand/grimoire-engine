@@ -21,12 +21,12 @@ Characters define speakers that can be referenced in dialogue nodes.
 ```yaml
 characters:
   wizard:
-	name: "Aldric"
-	color: "#9b59b6"
+    name: "Aldric"
+    color: "#9b59b6"
 
   player:
-	name: "Traveler"
-	color: "#3498db"
+    name: "Traveler"
+    color: "#3498db"
 ```
 
 ## Dialogues
@@ -68,10 +68,10 @@ Full object form:
 ```yaml
 choices:
   - text: "Choice text shown to player"
-	next: nodeId           # Next node to visit
-	condition: functionName # Optional TS function returning boolean
-	else: fallbackNodeId   # Optional node if condition fails
-	events: anEvent        # Optional events to run on selection
+    next: nodeId           # Next node to visit
+    condition: functionName # Optional TS function returning boolean
+    else: fallbackNodeId   # Optional node if condition fails
+    events: anEvent        # Optional events to run on selection
 ```
 
 Shorthand array form `[text, next]`:
@@ -85,12 +85,12 @@ choices:
 ```yaml
 greeting:
   message:
-	speaker: wizard
-	text: "[i]Well, well...[/i] A visitor!"
-	choices:
-	  - ["Who are you?", introduction]
-	  - ["I need help", helpCheck]
-	  - ["Goodbye", farewell]
+    speaker: wizard
+    text: "[i]Well, well...[/i] A visitor!"
+    choices:
+      - ["Who are you?", introduction]
+      - ["I need help", helpCheck]
+      - ["Goodbye", farewell]
 ```
 
 ### Branch Node
@@ -107,9 +107,9 @@ Routes to different nodes based on a condition.
 ```yaml
 helpCheck:
   branch:
-	condition: hasSpellbook
-	true: magicHelp
-	false: noSpellbook
+    condition: hasSpellbook
+    true: magicHelp
+    false: noSpellbook
 ```
 
 ### Sequence Node
@@ -128,22 +128,22 @@ Sequences can include `message`, `events`, `wait`, or any other dialogue node ty
 ```yaml
 bookOffer:
   sequence:
-	- message:
-		speaker: wizard
-		text: "Take this spellbook. Use it wisely."
+    - message:
+        speaker: wizard
+        text: "Take this spellbook. Use it wisely."
 
-	- events:
-		callFunctions:
-		  addItem: ["spellBook"]
+    - events:
+        callFunctions:
+          addItem: ["spellBook"]
 
-	- wait: 1
+    - wait: 1
 
-	- message:
-		speaker: wizard
-		text: "Now go, practice your craft!"
-		choices:
-		  - ["Thank you!", farewell]
-	- null # Completely end the dialogue
+    - message:
+        speaker: wizard
+        text: "Now go, practice your craft!"
+        choices:
+          - ["Thank you!", farewell]
+    - null # Completely end the dialogue
 ```
 
 ### Wait Node
@@ -192,12 +192,12 @@ Use a BBCode library like JiLiZART/bbob.
 ```yaml
 rooms:
   cottage:
-	actions:
-	  "Talk to wizard":
-		dialogue: wizardMeeting  # Start at 'start' node
+    actions:
+      "Talk to wizard":
+        dialogue: wizardMeeting  # Start at 'start' node
 
-	  "Ask about the garden":
-		dialogue: wizardMeeting.gardenPath  # Jump to specific node
+      "Ask about the garden":
+        dialogue: wizardMeeting.gardenPath  # Jump to specific node
 ```
 
 ### From Events
@@ -205,10 +205,10 @@ rooms:
 ```yaml
 events:
   meetWizard:
-	dialogue: wizardMeeting
+    dialogue: wizardMeeting
 
   continueConversation:
-	dialogue: wizardMeeting.gardenPath
+    dialogue: wizardMeeting.gardenPath
 ```
 
 ## Complete Example
@@ -218,111 +218,111 @@ version: 1
 
 characters:
   wizard:
-	name: "Aldric"
-	color: "#9b59b6"
+    name: "Aldric"
+    color: "#9b59b6"
 
   player:
-	name: "Traveler"
-	color: "#3498db"
+    name: "Traveler"
+    color: "#3498db"
 
 dialogues:
   wizardMeeting:
-	start: greeting
-	nodes:
-	  greeting:
-		message:
-		  speaker: wizard
-		  text: "[i]Well, well...[/i] A visitor!"
-		  choices:
-			- ["Who are you?", introduction]
-			- ["I need help", helpCheck]
-			- ["Goodbye", farewell]
+    start: greeting
+    nodes:
+      greeting:
+        message:
+          speaker: wizard
+          text: "[i]Well, well...[/i] A visitor!"
+          choices:
+            - ["Who are you?", introduction]
+            - ["I need help", helpCheck]
+            - ["Goodbye", farewell]
 
-	  helpCheck:
-		branch:
-		  condition: hasSpellbook
-		  true: magicHelp
-		  false: noSpellbook
+      helpCheck:
+        branch:
+          condition: hasSpellbook
+          true: magicHelp
+          false: noSpellbook
 
-	  introduction:
-		sequence:
-		  - message:
-			  speaker: wizard
-			  text: "I am Aldric the Ancient."
+      introduction:
+        sequence:
+          - message:
+              speaker: wizard
+              text: "I am Aldric the Ancient."
 
-		  - events:
-			  callFunctions:
-				playSound: ["wizard_laugh"]
+          - events:
+              callFunctions:
+                playSound: ["wizard_laugh"]
 
-		  - message:
-			  speaker: wizard
-			  text: "What brings you here?"
-			  choices:
-				- text: "The garden"
-				  next: gardenPath
-				  events:
-					callFunctions:
-					  setAskedAboutGarden: [true]
+          - message:
+              speaker: wizard
+              text: "What brings you here?"
+              choices:
+                - text: "The garden"
+                  next: gardenPath
+                  events:
+                    callFunctions:
+                      setAskedAboutGarden: [true]
 
-				- ["Magic training", magicHelp]
-				- ["Nothing", greeting]
+                - ["Magic training", magicHelp]
+                - ["Nothing", greeting]
 
-	  gardenPath:
-		message:
-		  speaker: wizard
-		  text: "Ah, the garden holds secrets..."
-		  choices:
-			- text: "Tell me more"
-			  next: gardenDetails
-			  condition: getAskedAboutGarden
-			  else: notYet
+      gardenPath:
+        message:
+          speaker: wizard
+          text: "Ah, the garden holds secrets..."
+          choices:
+            - text: "Tell me more"
+              next: gardenDetails
+              condition: getAskedAboutGarden
+              else: notYet
 
-			- ["Maybe later", greeting]
+            - ["Maybe later", greeting]
 
-	  notYet:
-		message:
-		  speaker: wizard
-		  text: "Perhaps when we know each other better."
-		  choices:
-			- ["Okay", greeting]
+      notYet:
+        message:
+          speaker: wizard
+          text: "Perhaps when we know each other better."
+          choices:
+            - ["Okay", greeting]
 
-	  magicHelp:
-		message:
-		  speaker: wizard
-		  text: "Magic requires dedication and the right tools."
-		  choices:
-			- ["What tools?", bookOffer]
-			- ["I understand", greeting]
+      magicHelp:
+        message:
+          speaker: wizard
+          text: "Magic requires dedication and the right tools."
+          choices:
+            - ["What tools?", bookOffer]
+            - ["I understand", greeting]
 
-	  bookOffer:
-		sequence:
-		  - message:
-			  speaker: wizard
-			  text: "Take this spellbook. Use it wisely."
+      bookOffer:
+        sequence:
+          - message:
+              speaker: wizard
+              text: "Take this spellbook. Use it wisely."
 
-		  - events:
-			  callFunctions:
-				addItem: ["spellBook"]
+          - events:
+              callFunctions:
+                addItem: ["spellBook"]
 
-		  - wait: 1
+          - wait: 1
 
-		  - message:
-			  speaker: wizard
-			  text: "Now go, practice your craft!"
-			  choices:
-				- ["Thank you!", farewell]
+          - message:
+              speaker: wizard
+              text: "Now go, practice your craft!"
+              choices:
+                - ["Thank you!", farewell]
 
-	  farewell:
-		message:
-		  speaker: player
-		  text: "Goodbye, Aldric."
-		  next: exit
+      farewell:
+        message:
+          speaker: player
+          text: "Goodbye, Aldric."
+          next: exit
 
-	  exit: null
+      exit: null
 
 rooms:
   cottage:
-	actions:
-	  "Talk to wizard":
-		dialogue: wizardMeeting
+    actions:
+      "Talk to wizard":
+        dialogue: wizardMeeting
 ```
