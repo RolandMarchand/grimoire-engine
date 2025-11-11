@@ -54,7 +54,7 @@ Events in the `events` map define game behaviors and can contain:
 | `go` | string | Room name to move the player to |
 | `check` | CheckConfig | Conditional test before running the event |
 | `updateRooms` | Record<string, Room> | Room modifications to apply |
-| `callFunctions` | Record<string, Array<string> | TypeScript functions to call paired with their optional string arguments |
+| `callFunctions` | Record<string, Array<string> or string | TypeScript functions to call paired with their optional string arguments |
 
 ### Check Configuration
 
@@ -98,6 +98,10 @@ rooms:
         - "actionName"      # event name
         - print: "action!"  # anonymous event
 ```
+
+## Dialogue
+
+
 
 ## Best Practices
 
