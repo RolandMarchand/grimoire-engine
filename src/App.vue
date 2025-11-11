@@ -92,8 +92,6 @@ onMounted(() => {
 
 <template>
   <main>
-   
-    
     <AnimatedBackground/>
     <SpeedControl 
       :speed="typewriterSpeed"
