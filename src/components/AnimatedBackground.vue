@@ -45,7 +45,7 @@ onMounted(() => {
 <template>
   <div class="grimoire-background">
     <div class="clouds"></div>
-    <div 
+    <!-- <div 
       class="glow-orb" 
       style="width: 300px; height: 300px; background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 100%); top: 20%; left: 10%; animation-duration: 4s;">
     </div>
@@ -58,7 +58,7 @@ onMounted(() => {
     <div 
       class="glow-orb" 
       style="width: 250px; height: 250px; background: radial-gradient(circle, rgba(109, 40, 217, 0.25) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); animation-duration: 6s; animation-delay: 2s;">
-    </div>
+    </div> -->
 <!--
     <div
       v-for="particle in particles"
@@ -97,8 +97,9 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background: url('../assets/backImage.jpg') no-repeat center;
+  background-size: 2000px;
   /*background: linear-gradient(135deg, #1a0033 0%, #2d0a4e 50%, #0f0020 100%);*/
-  background: rgb(12, 0, 19);
   z-index: -1;
 }
 
@@ -184,7 +185,7 @@ onMounted(() => {
   top: 0;
   bottom: 0;
   z-index: 2;
-  opacity: 0.3;
+  opacity: 0.5;
   -moz-animation:move-background 150s linear infinite;
   -ms-animation:move-background 150s linear infinite;
   -o-animation:move-background 150s linear infinite;
