@@ -3,12 +3,14 @@ import type {
     GameState, 
     Zone, 
     NavigationResult,
-    Room
+    Room,
+    DialogueState
 } from './game-types';
 import { EventProcessor } from './event-processor';
 import { RoomNavigator } from './room-navigator';
 import { ConditionChecker } from './condition-checker';
 import { FunctionRegistry } from './function-registry';
+import { DialogueProcessor } from './dialogue-processor';
 
 export class GameEngine {
     private _gameState: GameState;
@@ -17,6 +19,7 @@ export class GameEngine {
     private roomNavigator: RoomNavigator;
     private conditionChecker: ConditionChecker;
     private functionRegistry: FunctionRegistry;
+    private dialogueProcessor: DialogueProcessor | null = null;
     private _initialized: boolean = false;
 
     constructor() {
@@ -27,7 +30,6 @@ export class GameEngine {
             data: {}
         });
 
-        
         this._zoneData = reactive<Zone>({
             version: 1,
             spawn: '',
@@ -35,7 +37,6 @@ export class GameEngine {
             events: {}
         });
 
-        
         this.conditionChecker = new ConditionChecker(this._gameState);
         this.functionRegistry = new FunctionRegistry(this._gameState);
         this.eventProcessor = new EventProcessor(
@@ -51,7 +52,6 @@ export class GameEngine {
         );
     }
 
-    
     get gameState() {
         return readonly(this._gameState);
     }
@@ -64,24 +64,29 @@ export class GameEngine {
         return this._initialized;
     }
 
-   
     async initializeGame(zone: Zone): Promise<NavigationResult> {
-       
         Object.assign(this._zoneData, zone);
         
-      
         this._gameState.currentRoom = zone.spawn;
         this._gameState.flag = {};
         this._gameState.inventory = [];
         this._gameState.data = {};
 
+        if (zone.dialogues && zone.characters) {
+            this.dialogueProcessor = new DialogueProcessor(
+                this._gameState,
+                zone.dialogues,
+                zone.characters,
+                this.conditionChecker,
+                this.eventProcessor
+            );
+        }
+
         this._initialized = true;
 
-        // Navigate to spawn room
         return await this.roomNavigator.navigateToRoom(zone.spawn);
     }
 
-    // Main game actions
     async executeAction(actionName: string): Promise<NavigationResult> {
         if (!this._initialized) {
             throw new Error('Game not initialized. Call initializeGame() first.');
@@ -94,6 +99,35 @@ export class GameEngine {
             throw new Error('Game not initialized. Call initializeGame() first.');
         }
         return await this.roomNavigator.navigateToRoom(roomName);
+    }
+
+    async startDialogue(ref: string): Promise<DialogueState> {
+        if (!this.dialogueProcessor) {
+            console.error('No dialogue system initialized');
+            return { active: false };
+        }
+        return await this.dialogueProcessor.startDialogue(ref);
+    }
+
+    async selectDialogueChoice(choiceIndex: number): Promise<DialogueState> {
+        if (!this.dialogueProcessor) {
+            return { active: false };
+        }
+        return await this.dialogueProcessor.selectChoice(choiceIndex);
+    }
+
+    async continueDialogue(): Promise<DialogueState> {
+        if (!this.dialogueProcessor) {
+            return { active: false };
+        }
+        return await this.dialogueProcessor.continueDialogue();
+    }
+
+    getCurrentDialogueChoices(): any[] {
+        if (!this.dialogueProcessor) {
+            return [];
+        }
+        return this.dialogueProcessor.getCurrentChoicesData();
     }
 
     getAvailableActions(): string[] {
@@ -129,22 +163,13 @@ export class GameEngine {
         this._gameState.data[key] = value;
     }
 
- 
     registerTest(name: string, testFn: (state: GameState, ...args: string[]) => boolean): void {
         this.conditionChecker.registerTest(name, testFn);
     }
 
-
     registerFunction(name: string, fn: (state: GameState, ...args: string[]) => void): void {
         this.functionRegistry.registerFunction(name, fn);
     }
-
- 
-
-   
-
-   
 }
-
 
 export const gameEngine = new GameEngine();

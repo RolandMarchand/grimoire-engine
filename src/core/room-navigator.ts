@@ -24,7 +24,6 @@ export class RoomNavigator {
             roomChanged: false
         };
 
-
         if (!this.zoneData.rooms[roomName]) {
             result.messages.push(`[Error: Room "${roomName}" does not exist]`);
             return result;
@@ -34,22 +33,22 @@ export class RoomNavigator {
         const currentRoom = this.zoneData.rooms[currentRoomName];
         const targetRoom = this.zoneData.rooms[roomName];
 
-        // Process onExit events from current room
         if (currentRoom?.onExit) {
             const exitResult = await this.eventProcessor.processEventChain(currentRoom.onExit);
             result.messages.push(...exitResult.messages);
 
-            // If onExit triggers a different navigation, follow that instead
             if (exitResult.navigateTo && exitResult.navigateTo !== roomName) {
                 console.warn(`onExit triggered navigation to ${exitResult.navigateTo}, aborting navigation to ${roomName}`);
                 return this.navigateToRoom(exitResult.navigateTo);
             }
-        }
 
+            if (exitResult.startDialogue) {
+                result.startDialogue = exitResult.startDialogue;
+            }
+        }
 
         this.gameState.currentRoom = roomName;
         result.roomChanged = true;
-
 
         if (targetRoom.shortDescription) {
             result.messages.push(targetRoom.shortDescription);
@@ -58,18 +57,19 @@ export class RoomNavigator {
             result.messages.push(targetRoom.longDescription);
         }
 
-        // Process onEntry events for new room
         if (targetRoom.onEntry) {
             const entryResult = await this.eventProcessor.processEventChain(targetRoom.onEntry);
             result.messages.push(...entryResult.messages);
 
-            // If onEntry triggers navigation, follow it
             if (entryResult.navigateTo) {
                 console.log(`onEntry triggered navigation to ${entryResult.navigateTo}`);
                 return this.navigateToRoom(entryResult.navigateTo);
             }
-        }
 
+            if (entryResult.startDialogue) {
+                result.startDialogue = entryResult.startDialogue;
+            }
+        }
 
         result.actions = this.getAvailableActions(roomName);
 
@@ -94,7 +94,6 @@ export class RoomNavigator {
             roomChanged: false
         };
 
-
         if (actionName === "[Nothing]") {
             result.messages.push("");
             result.actions = this.getAvailableActions(this.gameState.currentRoom);
@@ -103,7 +102,6 @@ export class RoomNavigator {
 
         const currentRoomName = this.gameState.currentRoom;
         const currentRoom = this.zoneData.rooms[currentRoomName];
-
 
         if (!currentRoom || !currentRoom.actions) {
             result.messages.push(`[Error: No actions available in current room]`);
@@ -118,25 +116,28 @@ export class RoomNavigator {
             return result;
         }
 
-
         if (actionEventChain === null) {
             result.messages.push("");
             result.actions = this.getAvailableActions(currentRoomName);
             return result;
         }
 
-
         const actionResult = await this.eventProcessor.processEventChain(actionEventChain);
         result.messages.push(...actionResult.messages);
 
-
-        if (actionResult.navigateTo) {
+        if (actionResult.startDialogue) {
+            result.startDialogue = actionResult.startDialogue;
+            result.actions = this.getAvailableActions(currentRoomName);
+        } else if (actionResult.navigateTo) {
             const navResult = await this.navigateToRoom(actionResult.navigateTo);
             result.messages.push(...navResult.messages);
             result.actions = navResult.actions;
             result.roomChanged = true;
+            
+            if (navResult.startDialogue) {
+                result.startDialogue = navResult.startDialogue;
+            }
         } else {
-
             result.actions = this.getAvailableActions(currentRoomName);
         }
 

@@ -71,7 +71,7 @@ onMounted(() => {
     <div class="story-content">
       <Fade>
         <p v-for="(text, index) in displayedTexts" :key="index">
-          {{ text }}<span v-if="index === displayedTexts.length - 1 && isTyping" class="cursor">|</span>
+          <span v-html="text"></span><span v-if="index === displayedTexts.length - 1 && isTyping" class="cursor">|</span>
         </p>
       </Fade>
     </div>
@@ -92,10 +92,10 @@ onMounted(() => {
   font-weight: 400;
   font-size: 1.5em;
 
-  /* For Firefox */
+
   scrollbar-width: none;
 
-  /* For Chrome, Safari, and Opera */
+ 
   &::-webkit-scrollbar {
     display: none;
   }
@@ -113,5 +113,22 @@ onMounted(() => {
   50%, 100% {
     opacity: 0;
   }
+}
+
+
+#story-box :deep(em) {
+  font-style: italic;
+}
+
+#story-box :deep(strong) {
+  font-weight: bold;
+}
+
+#story-box :deep(u) {
+  text-decoration: underline;
+}
+
+#story-box :deep(s) {
+  text-decoration: line-through;
 }
 </style>

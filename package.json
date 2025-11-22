@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@bbob/html": "^4.3.1",
+    "@bbob/preset-html5": "^4.3.1",
     "js-yaml": "^4.1.0",
     "vue": "^3.5.13",
     "zod": "^3.24.1"

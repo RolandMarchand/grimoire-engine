@@ -1,15 +1,30 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import SaveLoadUI from "./SaveLoadUI.vue";
+import type { SaveData } from "../core/save-manager";
+
+const saveLoadUIRef = ref<InstanceType<typeof SaveLoadUI> | null>(null);
 
 const props = defineProps<{
   speed: number;
   minSpeed?: number;
   maxSpeed?: number;
+  gameState: {
+    currentRoom: string;
+    inventory: string[];
+    flag: Record<string, boolean>;
+    data: Record<string, any>;
+  };
+  currentRoomName: string;
+  paragraphs: string[];
+  dialogueActive: boolean;
 }>();
 
 const emit = defineEmits<{
   increaseSpeed: [];
   decreaseSpeed: [];
+  load: [saveData: SaveData];
+  saved: [];
 }>();
 
 const minSpeed = props.minSpeed ?? 0;
@@ -33,6 +48,25 @@ const handleDecrease = () => {
     emit('decreaseSpeed');
   }
 };
+
+const handleLoad = (saveData: SaveData) => {
+  emit('load', saveData);
+};
+
+const handleSaved = () => {
+  emit('saved');
+};
+
+// Expose autoSave method to parent components
+const autoSave = async () => {
+  if (saveLoadUIRef.value) {
+    await saveLoadUIRef.value.autoSave();
+  }
+};
+
+defineExpose({
+  autoSave
+});
 </script>
 
 <template>
@@ -54,6 +88,17 @@ const handleDecrease = () => {
     >
       -
     </button>
+    
+    
+    <SaveLoadUI
+      ref="saveLoadUIRef"
+      :game-state="gameState"
+      :current-room-name="currentRoomName"
+      :paragraphs="paragraphs"
+      :dialogue-active="dialogueActive"
+      @load="handleLoad"
+      @saved="handleSaved"
+    />
   </div>
 </template>
 

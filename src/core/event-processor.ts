@@ -45,6 +45,11 @@ export class EventProcessor {
                 result.navigateTo = eventResult.navigateTo;
                 break;
             }
+
+            if (eventResult.startDialogue) {
+                result.startDialogue = eventResult.startDialogue;
+                break;
+            }
         }
 
         return result;
@@ -78,7 +83,6 @@ export class EventProcessor {
                 }
                 return result;
             }
-            
         }
 
         if (event.print) {
@@ -95,13 +99,16 @@ export class EventProcessor {
             result.stateUpdated = true;
         }
 
-        
+        if (event.dialogue) {
+            result.startDialogue = event.dialogue;
+            return result;
+        }
+
         if (event.go) {
             result.navigateTo = event.go.trim();
             return result;
         }
 
-       
         if (event.chain) {
             const chainResult = await this.processEventChain(event.chain);
             result.messages.push(...chainResult.messages);
@@ -109,6 +116,10 @@ export class EventProcessor {
             
             if (chainResult.navigateTo) {
                 result.navigateTo = chainResult.navigateTo;
+            }
+
+            if (chainResult.startDialogue) {
+                result.startDialogue = chainResult.startDialogue;
             }
         }
 

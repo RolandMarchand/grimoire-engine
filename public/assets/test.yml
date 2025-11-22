@@ -1,379 +1,159 @@
 version: 1
 
-spawn: village_square
+spawn: cottage
+
+characters:
+  wizard:
+    name: "Aldric"
+    color: "#9b59b6"
+  
+  player:
+    name: "Traveler"
+    color: "#3498db"
 
 rooms:
-  village_square:
-    shortDescription: "Grimorie Village Square"
-    longDescription: "The heart of Grimorie bustles with morning activity. Merchants hawk their wares, children play near the fountain, and the aroma of fresh bread wafts from the bakery. The mayor's house stands to the north, an old forest path leads east, and the marketplace extends south."
+  cottage:
+    shortDescription: "A cozy stone cottage"
+    longDescription: "A small cottage with a thatched roof and warm fireplace. An old wizard sits by the fire."
     actions:
-      "Talk to merchant":
-        print: "Merchant: 'Strange things happening in the eastern forest lately. I'd stay away if I were you!'"
-      "Examine fountain":
-        check:
-          test: hasFlag
-          arguments: ["coin_taken"]
-          failed:
-            chain:
-              - print: "The ancient fountain depicts a hero defeating a dragon."
-              - print: "You notice something glinting at the bottom..."
-              - updateRooms:
-                  village_square:
-                    actions:
-                      "Talk to merchant":
-                        print: "Merchant: 'Strange things happening in the eastern forest lately!'"
-                      "Examine fountain":
-                        print: "The fountain's water is crystal clear."
-                      "Reach into fountain":
-                        chain:
-                          - print: "You fish out an old silver coin!"
-                          - callFunctions:
-                              addItem: ["silver_coin"]
-                              setFlag: ["coin_taken", "true"]
-                          - print: "It bears the symbol of an ancient kingdom."
-                          - updateRooms:
-                              village_square:
-                                actions:
-                                  "Talk to merchant":
-                                    print: "Merchant: 'Strange things happening in the eastern forest lately!'"
-                                  "Examine fountain":
-                                    print: "The ancient fountain depicts a hero defeating a dragon. The water is crystal clear."
-                                  "Visit mayor": "talk_to_mayor"
-                                  "Enter forest":
-                                    print: "You head down the shadowy forest path..."
-                                    go: "forest_entrance"
-                                  "Go to marketplace":
-                                    go: "marketplace"
-                      "Visit mayor": "talk_to_mayor"
-                      "Enter forest":
-                        print: "You head down the shadowy forest path..."
-                        go: "forest_entrance"
-                      "Go to marketplace":
-                        go: "marketplace"
-        print: "The ancient fountain depicts a hero defeating a dragon. The water is crystal clear."
-      "Visit mayor": "talk_to_mayor"
-      "Enter forest":
-        print: "You head down the shadowy forest path..."
-        go: "forest_entrance"
-      "Go to marketplace":
-        go: "marketplace"
+      "Talk to wizard": 
+        dialogue: wizardMeeting
+      "Exit to garden": 
+        print: "You step outside into the garden."
+        go: garden
 
-  marketplace:
-    shortDescription: "Busy Marketplace"
-    longDescription: "Vendors sell everything from fresh vegetables to mysterious potions. An old woman at a small stall catches your eye. A blacksmith's shop stands to the west."
+  garden:
+    shortDescription: "An overgrown garden"
+    longDescription: "Wild roses climb the ancient stone walls. A mysterious archway stands among the tangled vines."
     actions:
-      "Talk to old woman":
-        check:
-          test: hasFlag
-          arguments: ["has_lantern"]
-          failed:
-            check:
-              test: hasFlag
-              arguments: ["know_about_cave"]
-              failed:
-                chain:
-                  - print: "Old Woman: 'You look like someone who seeks adventure...'"
-                  - print: "Old Woman: 'But you're not ready yet. Come back when you know what you seek.'"
-            chain:
-              - print: "Old Woman: 'Ah, you seek the Crystal Cave! You'll need this.'"
-              - print: "She hands you an ancient lantern that glows with inner light."
-              - callFunctions:
-                  addItem: ["magic_lantern"]
-                  setFlag: ["has_lantern", "true"]
-              - print: "Old Woman: 'This will light your way through the darkness.'"
-        print: "Old Woman: 'May the light guide you safely, young adventurer.'"
-      
-      "Buy rope":
-        check:
-          test: hasItem
-          arguments: ["rope"]
-          failed:
-            check:
-              test: hasItem
-              arguments: ["silver_coin"]
-              failed:
-                print: "Vendor: 'That'll be one silver coin. No coin, no rope!'"
-            chain:
-              - print: "You trade your silver coin for a sturdy rope."
-              - callFunctions:
-                  removeItem: ["silver_coin"]
-                  addItem: ["rope"]
-        print: "Vendor: 'You already bought my finest rope!'"
-      
-      "Visit blacksmith":
-        go: "blacksmith_shop"
-      
-      "Return to square":
-        go: "village_square"
-
-  blacksmith_shop:
-    shortDescription: "The Blacksmith's Shop"
-    longDescription: "The heat from the forge fills the room. Weapons and tools line the walls. The blacksmith, a burly man with soot-covered arms, hammers away at a piece of metal."
-    actions:
-      "Talk to blacksmith":
-        check:
-          test: hasFlag
-          arguments: ["quest_started"]
-          failed:
-            print: "Blacksmith: 'Welcome! I make the finest weapons in Grimorie. Come back if you need something for an adventure.'"
-        chain:
-          - check:
-              test: hasItem
-              arguments: ["sword"]
-              failed:
-                chain:
-                  - print: "Blacksmith: 'Ah, the mayor sent you? You'll need a proper weapon for the Whispering Woods.'"
-                  - print: "He hands you a well-balanced sword. 'This was meant for the town guard, but you need it more.'"
-                  - callFunctions:
-                      addItem: ["sword"]
-                  - print: "Blacksmith: 'Also, take this waterskin. Stay hydrated out there.'"
-                  - callFunctions:
-                      addItem: ["empty_waterskin"]
-          - print: "Blacksmith: 'That sword will serve you well. Take care of it!'"
-      
-      "Return to marketplace":
-        go: "marketplace"
-
-  forest_entrance:
-    shortDescription: "Edge of the Whispering Woods"
-    longDescription: "Tall trees loom overhead, their branches creating a canopy that filters the sunlight into dancing patterns. A path leads deeper into the forest, and you can hear a stream to the north."
-    onEntry:
-      check:
-        test: hasFlag
-        arguments: ["first_forest_visit"]
-        failed:
-          chain:
-            - print: "The forest seems to whisper secrets in a language you don't understand."
-            - callFunctions:
-                setFlag: ["first_forest_visit", "true"]
-    actions:
-      "Follow path deeper":
-        go: "deep_forest"
-      "Go to stream":
-        go: "forest_stream"
-      "Return to village":
-        go: "village_square"
-
-  forest_stream:
-    shortDescription: "Babbling Brook"
-    longDescription: "Clear water flows over smooth stones. The sound is peaceful and calming. An old hermit sits on a rock, fishing."
-    actions:
-      "Talk to hermit":
-        check:
-          test: hasFlag
-          arguments: ["know_about_cave"]
-          failed:
-            chain:
-              - print: "Hermit: 'Looking for the Crystal Cave, are you?'"
-              - print: "Hermit: 'It's hidden deep in the forest, behind the great oak.'"
-              - print: "Hermit: 'But beware - the cave is dark, and strange creatures guard its treasures.'"
-              - callFunctions:
-                  setFlag: ["know_about_cave", "true"]
-              - print: "Hermit: 'You might want to find some light before venturing there.'"
-        print: "Hermit: 'Remember - sometimes the peaceful path is the wisest. Not all guardians seek battle.'"
-      
-      "Fill waterskin":
-        check:
-          test: hasItem
-          arguments: ["full_waterskin"]
-          failed:
-            check:
-              test: hasItem
-              arguments: ["empty_waterskin"]
-              failed:
-                print: "You have nothing to carry water in."
-            chain:
-              - print: "You fill your waterskin with fresh, cool water."
-              - callFunctions:
-                  removeItem: ["empty_waterskin"]
-                  addItem: ["full_waterskin"]
-        print: "Your waterskin is already full of water."
-      
-      "Return to forest entrance":
-        go: "forest_entrance"
-
-  deep_forest:
-    shortDescription: "Deep in the Whispering Woods"
-    longDescription: "The forest is darker here, with ancient trees that seem to watch your every move. A massive oak tree stands before you, its trunk wider than a house. Strange symbols are carved into its bark."
-    actions:
-      "Examine oak tree":
-        check:
-          test: hasFlag
-          arguments: ["know_about_cave"]
-          failed:
-            print: "The tree is impressive, but you don't notice anything special about it."
-        chain:
-          - print: "Now that you know what to look for, you spot a hidden entrance behind the oak!"
-          - updateRooms:
-              deep_forest:
-                actions:
-                  "Examine oak tree":
-                    print: "The massive oak has a secret entrance behind it."
-                  "Enter hidden cave":
-                    go: "crystal_cave_entrance"
-                  "Return to forest entrance":
-                    go: "forest_entrance"
-      "Return to forest entrance":
-        go: "forest_entrance"
-
-  crystal_cave_entrance:
-    shortDescription: "Cave Entrance"
-    longDescription: "A narrow opening in the rock face leads into absolute darkness. Cold air flows from within, carrying a musty smell of ancient stones."
-    actions:
-      "Enter cave":
-        check:
-          test: hasItem
-          arguments: ["magic_lantern"]
-          failed:
-            print: "It's pitch black inside. You can't see anything and dare not continue without light."
-        chain:
-          - print: "Your magic lantern illuminates the path ahead with its ethereal glow."
-          - go: "crystal_cave_interior"
-      "Go back to forest":
-        go: "deep_forest"
-
-  crystal_cave_interior:
-    shortDescription: "The Crystal Cave"
-    longDescription: "Your lantern reveals a breathtaking sight: thousands of crystals embedded in the walls reflect the light in a rainbow of colors. In the center of the cave, a pedestal holds a large blue crystal that pulses with inner power."
-    onEntry: "cave_guardian_appears"
-    actions:
-      "Take crystal":
-        check:
-          test: hasFlag
-          arguments: ["guardian_defeated"]
-          failed:
-            print: "The guardian spirit blocks your path! You cannot reach the crystal."
-        chain:
-          - print: "You carefully take the Crystal of Grimorie from its pedestal."
-          - callFunctions:
-              addItem: ["crystal_of_grimorie"]
-              setFlag: ["have_crystal", "true"]
-          - print: "The cave begins to rumble! It's collapsing!"
-          - go: "cave_collapse_sequence"
-      "Fight guardian":
-        check:
-          test: hasFlag
-          arguments: ["guardian_defeated"]
-          failed:
-            check:
-              test: hasItem
-              arguments: ["sword"]
-              failed:
-                chain:
-                  - print: "You try to fight the guardian with your bare hands, but it's no use!"
-                  - print: "The guardian knocks you back. You need a weapon!"
-            chain:
-              - print: "You draw your sword and battle the guardian spirit!"
-              - print: "After an intense fight, the guardian dissipates into mist."
-              - callFunctions:
-                  setFlag: ["guardian_defeated", "true"]
-              - print: "The path to the crystal is now clear."
-        print: "The guardian has already been defeated."
-      "Offer water to guardian":
-        check:
-          test: hasFlag
-          arguments: ["guardian_defeated"]
-          failed:
-            check:
-              test: hasItem
-              arguments: ["full_waterskin"]
-              failed:
-                print: "You have nothing to offer the guardian."
-            chain:
-              - print: "You respectfully offer the pure water to the guardian spirit."
-              - print: "The guardian's eyes soften. It nods and steps aside, granting you passage."
-              - callFunctions:
-                  removeItem: ["full_waterskin"]
-                  addItem: ["empty_waterskin"]
-                  setFlag: ["guardian_defeated", "true"]
-              - print: "Sometimes peace is stronger than the sword."
-        print: "The guardian has already been pacified."
-      "Flee":
-        print: "You run back to the cave entrance!"
-        go: "crystal_cave_entrance"
-
-  cave_collapse_sequence:
-    shortDescription: "Collapsing Cave"
-    longDescription: "Rocks fall from the ceiling! The cave is collapsing around you!"
-    onEntry:
-      check:
-        test: hasItem
-        arguments: ["rope"]
-        failed: "cave_collapse_no_rope"
-      chain:
-        - print: "You quickly tie your rope to a sturdy rock and rappel down a chasm to safety!"
-        - print: "You emerge from a hidden exit, finding yourself back in the forest."
-        - callFunctions:
-            setFlag: ["used_rope", "true"]
-        - go: "forest_entrance_victorious"
-
-  forest_entrance_victorious:
-    shortDescription: "Edge of the Whispering Woods"
-    longDescription: "You've emerged from your adventure, crystal in hand. The forest seems brighter somehow."
-    onEntry:
-      print: "You've done it! You have the Crystal of Grimorie!"
-    actions:
-      "Return to village":
-        go: "village_square_victorious"
-
-  village_square_victorious:
-    shortDescription: "Grimorie Village Square - Hero's Return"
-    longDescription: "The entire village has gathered to celebrate your return!"
-    onEntry: "victory_celebration"
-    actions:
-      "Present crystal to mayor":
-        chain:
-          - print: "Mayor: 'You've saved our village! The Crystal will protect us for generations!'"
-          - print: "The crowd cheers! You are the Hero of Grimorie!"
-          - callFunctions:
-              setFlag: ["game_complete", "true"]
-          - print: "THE END - Thanks for playing!"
-      "Keep crystal for yourself":
-        chain:
-          - print: "You decide to keep the crystal's power for yourself."
-          - print: "The mayor looks disappointed, but respects your choice."
-          - print: "You leave the village to seek new adventures, crystal in hand."
-          - callFunctions:
-              setFlag: ["game_complete", "true"]
-          - print: "THE END - Thanks for playing!"
+      "Return to cottage":
+        print: "You return to the cottage."
+        go: cottage
+      "Examine archway": "examineArchway"
 
 events:
-  talk_to_mayor:
+  examineArchway:
     check:
-      test: hasFlag
-      arguments: ["have_crystal"]
+      test: hasItem
+      arguments: ["spellbook"]
       failed:
-        chain:
-          - print: "Mayor: 'Welcome, young adventurer! Our village needs help.'"
-          - print: "Mayor: 'The Crystal of Grimorie was stolen and hidden in the Whispering Woods.'"
-          - print: "Mayor: 'Without it, our village's protective magic will fade.'"
-          - print: "Mayor: 'Please, brave soul, will you retrieve it for us?'"
-          - callFunctions:
-              setFlag: ["quest_started", "true"]
-          - print: "Mayor: 'Speak with the blacksmith - he'll equip you for the journey.'"
-    print: "Mayor: 'Have you found the Crystal of Grimorie yet? Please hurry!'"
+        print: "The archway seems dormant. Perhaps it requires magic to activate."
+    print: "The archway begins to glow with magical energy!"
 
-  cave_guardian_appears:
-    check:
-      test: hasFlag
-      arguments: ["guardian_appeared"]
-      failed:
-        chain:
-          - print: "As you enter, a ghostly figure materializes before the crystal!"
-          - print: "Guardian Spirit: 'None may take the crystal without proving their worth!'"
-          - print: "The guardian blocks the path to the crystal, waiting for your next move."
-          - callFunctions:
-              setFlag: ["guardian_appeared", "true"]
+dialogues:
+  wizardMeeting:
+    start: greeting
+    nodes:
+      greeting:
+        message:
+          speaker: wizard
+          text: "[i]Well, well...[/i] A visitor! What brings you to my humble cottage?"
+          choices:
+            - ["Who are you?", introduction]
+            - ["I need help", helpRequest]
+            - ["Just passing through", farewell]
 
-  cave_collapse_no_rope:
-    chain:
-      - print: "Without rope, you barely escape with your life!"
-      - print: "You tumble out of the cave, bruised but alive."
-      - print: "At least you have the crystal..."
-      - go: "forest_entrance_victorious"
+      introduction:
+        message:
+          speaker: wizard
+          text: "I am Aldric the Ancient, keeper of arcane knowledge and guardian of this enchanted garden."
+          choices:
+            - ["Tell me about the garden", gardenPath]
+            - ["Can you teach me magic?", magicHelp]
+            - ["I should go", farewell]
 
-  victory_celebration:
-    chain:
-      - print: "Villagers: 'The hero returns! They have the Crystal!'"
-      - print: "Children gather around you, eyes wide with wonder."
-      - print: "The mayor approaches with a grateful smile."
+      helpRequest:
+        branch:
+          condition: hasItem
+          true: alreadyHasBook
+          false: offerHelp
+
+      offerHelp:
+        message:
+          speaker: wizard
+          text: "Hmm, you seem genuine. Perhaps I can assist you. What do you seek?"
+          choices:
+            - ["Magic training", magicHelp]
+            - ["Knowledge of the garden", gardenPath]
+            - ["Nothing, thank you", farewell]
+
+      alreadyHasBook:
+        message:
+          speaker: wizard
+          text: "I see you already possess my spellbook. Use it wisely, young one."
+          choices:
+            - ["Tell me more about it", bookExplanation]
+            - ["Goodbye", farewell]
+
+      bookExplanation:
+        message:
+          speaker: wizard
+          text: "The spellbook contains ancient incantations. The garden archway will respond to your magical touch now."
+          next: farewell
+
+      magicHelp:
+        sequence:
+          - message:
+              speaker: wizard
+              text: "Magic requires dedication and the right tools. I sense potential in you."
+
+          - message:
+              speaker: wizard
+              text: "Take this ancient spellbook. It contains the basics you'll need."
+              choices:
+                - text: "Thank you!"
+                  next: receiveBook
+                  events:
+                    callFunctions:
+                      addItem: ["spellbook"]
+                      setFlag: ["receivedBook", "true"]
+
+                - ["I'm not ready", notReady]
+
+      receiveBook:
+        message:
+          speaker: wizard
+          text: "Use it well. The garden archway may now respond to your presence."
+          choices:
+            - ["I'll practice carefully", farewell]
+
+      notReady:
+        message:
+          speaker: wizard
+          text: "Very well. Return when you feel prepared."
+          next: farewell
+
+      gardenPath:
+        message:
+          speaker: wizard
+          text: "Ah, the garden holds many secrets. The archway is particularly interesting..."
+          choices:
+            - text: "What does it do?"
+              next: archwayCond
+              condition: hasFlag
+              else: archwayBasic
+
+            - ["Maybe another time", greeting]
+
+      archwayBasic:
+        message:
+          speaker: wizard
+          text: "I cannot reveal its secrets to just anyone. Perhaps if you were a student of magic..."
+          choices:
+            - ["Can you teach me?", magicHelp]
+            - ["I understand", farewell]
+
+      archwayCond:
+        message:
+          speaker: wizard
+          text: "Since you possess the spellbook, I can tell you - it's a portal to the ancient library. Touch it with your magical focus."
+          choices:
+            - ["Fascinating!", farewell]
+
+      farewell:
+        message:
+          speaker: player
+          text: "Goodbye, Aldric. Thank you for your time."
+          next: exit
+
+      exit: null
