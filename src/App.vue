@@ -2,6 +2,7 @@
 import TextBox from "./components/TextBox.vue";
 import ActionBar from "./components/ActionBar.vue";
 import SpeedControl from "./components/SpeedControl.vue";
+import AnimatedBackground from "./components/AnimatedBackground.vue";
 
 import { getZone } from "./core/game-definition.ts";
 import { GameEngine } from "./core/game-engine.ts";
@@ -45,16 +46,8 @@ const parseBBCode = (text: string): string => {
     .replace(/\[s\](.*?)\[\/s\]/g, '<s>$1</s>');            // Strikethrough
 };
 
-const increaseSpeed = () => {
-  if (typewriterSpeed.value > 0) {
-    typewriterSpeed.value = Math.max(0, typewriterSpeed.value - 5);
-  }
-};
-
-const decreaseSpeed = () => {
-  if (typewriterSpeed.value < 100) {
-    typewriterSpeed.value = Math.min(100, typewriterSpeed.value + 5);
-  }
+const setSpeed = (speed: number) => {
+  typewriterSpeed.value = speed;
 };
 
 // Auto-save trigger - call this after state changes
@@ -250,6 +243,7 @@ onMounted(() => {
 
 <template>
   <main>
+    <AnimatedBackground/>
     <SpeedControl 
       ref="speedControlRef"
       :speed="typewriterSpeed"
@@ -257,8 +251,7 @@ onMounted(() => {
       :current-room-name="currentRoomName"
       :paragraphs="paragraphs"
       :dialogue-active="dialogueState.active"
-      @increaseSpeed="increaseSpeed"
-      @decreaseSpeed="decreaseSpeed"
+      @setSpeed="setSpeed"
       @load="handleLoad"
       @saved="handleSaved"
     />
