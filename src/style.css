@@ -1,26 +1,125 @@
-html, body {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* Global base layout (compatible with Grimoire Engine themes) */
 
+/* Import theme variables - must be loaded first */
+@import url('/themes/theme-variables.css');
+
+/* Base Layout */
+
+html {
+  font-family: var(--font-main);
+  line-height: 1.5;
+  font-weight: var(--font-weight-main);
+  font-size: var(--font-size-base);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-
+  color-scheme: dark;
+  color: var(--color-text);
+  background: var(--color-bg);
   margin: 0;
   padding: 0;
-  overflow: hidden;
-  position: fixed;
   width: 100%;
   height: 100%;
-
-  color-scheme: dark;
-  color: #f8fafc;
-  background: #0f172a;
+  overflow: hidden;
+  transition: background 1s ease-in-out;
 }
 
+/* Don't fix body position, otherwise background animations, texture layers, and scrolling will be locked */
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  position: relative;
+  z-index: var(--z-index-background);
+}
+
+/* Main app layer always above texture layer */
 #app {
+  position: relative;
+  z-index: var(--z-index-app);
   width: 100vw;
   height: 100vh;
   margin: 0;
   padding: 0;
+}
+
+/* Background Layers */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-background);
+  background-image: var(--sky-tex);
+  background-repeat: var(--sky-repeat);
+  background-size: var(--sky-size);
+  opacity: var(--sky-opacity);
+  animation: scrollClouds var(--sky-speed) linear infinite;
+}
+
+@keyframes scrollClouds {
+  from { background-position-x: 0; }
+  to   { background-position-x: -100%; }
+}
+
+@keyframes scrollPattern {
+  from { background-position: 0 0; }
+  to   { background-position: 360px 360px; }
+}
+
+/* General UI Elements */
+
+/* Story Box */
+#story-box {
+  background: var(--textbox-bg) no-repeat center/cover, var(--color-box);
+  color: var(--text-story);
+  font-family: var(--font-story);
+  font-size: var(--font-size-textbox);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-glow);
+  padding: var(--padding-textbox);
+  transition: background-color var(--fade-duration) ease-in-out,
+              box-shadow var(--fade-duration) ease-in-out,
+              color var(--fade-duration) ease-in-out;
+}
+
+/* Action Bar */
+#actions {
+  background-image: var(--actionbar-bg);
+  background-repeat: repeat-x;
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: multiply;
+  backdrop-filter: blur(var(--actionbar-backdrop-blur));
+  border-top: var(--border-width-thick) solid var(--actionbar-border-top);
+  box-shadow: var(--shadow-actionbar);
+  z-index: var(--z-index-actionbar);
+}
+
+/* Buttons */
+button {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-button);
+  font-size: var(--font-size-button);
+  color: var(--text-action);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-normal) ease;
+}
+
+button:hover {
+  color: var(--color-accent);
+}
+
+button:active {
+  color: var(--text-active);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--text-disabled);
 }

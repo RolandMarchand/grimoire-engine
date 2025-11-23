@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AnimatedBackground from "./components/AnimatedBackground.vue";
 import StatusBar from "./components/StatusBar.vue";
 import TextBox from "./components/TextBox.vue";
 import ActionBar from "./components/ActionBar.vue";
@@ -9,6 +10,7 @@ import type { GameState } from "./core/game-types.ts";
 import { GameEngine } from "./core/game-engine.ts";
 
 import { ref, onMounted, Ref, computed } from "vue";
+import { watchEffect } from "vue";
 
 const paragraphs: Ref<Array<string>> = ref([]);
 const actions: Ref<Array<string>> = ref([]);
@@ -60,6 +62,32 @@ const initializeEngine = async () => {
   }
 };
 
+/* Dynamic Theme System */
+const currentTheme = ref("themedefault.css");
+
+const loadTheme = (themeFile: string) => {
+  const existing = document.getElementById("active-theme") as HTMLLinkElement | null;
+  const themeUrl = `/themes/${themeFile}?v=${Date.now()}`;
+  if (existing) {
+    existing.href = themeUrl;
+  } else {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.id = "active-theme";
+    link.href = themeUrl;
+    document.head.appendChild(link);
+  }
+};
+
+onMounted(() => {
+  loadTheme(currentTheme.value);
+});
+
+const switchTheme = (themeName: string) => {
+  currentTheme.value = themeName;
+  loadTheme(themeName);
+};
+
 const doAction = async (action: string): Promise<void> => {
   try {
     showActions.value = false;
@@ -98,9 +126,14 @@ onMounted(() => {
 </script>
 
 <template>
+<button
+  class="theme-toggle"
+  @click="switchTheme(currentTheme === 'themedefault.css' ? 'themenight.css' : 'themedefault.css')">
+  Switch Theme
+</button>    
   <main>
-   
-    
+    <!-- Animated background covering the entire screen -->
+    <AnimatedBackground />
     
     <SpeedControl 
       :speed="typewriterSpeed"
@@ -117,25 +150,49 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* Main page container */
 main {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  min-height: 100vh;
+  width: 100%;
+  padding: 2vh 0;
 }
 
+/* Theme toggle button */
+.theme-toggle {
+  position: fixed;
+  top: var(--theme-toggle-top);
+  left: var(--theme-toggle-left);
+  z-index: var(--z-index-theme-toggle);
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-main);
+  font-size: var(--font-size-theme-toggle);
+  color: var(--color-text);
+  background: var(--bg-theme-toggle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-small);
+  padding: var(--padding-small);
+  cursor: pointer;
+  backdrop-filter: blur(1px);
+  transition: background-color var(--transition-normal) ease, color var(--transition-normal) ease;
+}
 
+.theme-toggle:hover {
+  background-color: var(--bg-theme-toggle-hover);
+  color: var(--color-accent);
+}
 
-
-
+/* Debug area (preserved) */
 .flag-item, .data-item {
   display: block;
   margin-left: 10px;
-  color: #0f0;
+  color: var(--text-debug);
 }
-
-
 </style>
+
+
