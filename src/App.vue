@@ -66,7 +66,6 @@ const triggerAutoSave = async () => {
 const initializeEngine = async () => {
   try {
     const zone = await getZone();
-
     if (!zone) {
       paragraphs.value.push("Error: Zone data is unavailable.");
       return;
@@ -242,46 +241,40 @@ onMounted(() => {
 </script>
 
 <template>
-  <main>
-    <AnimatedBackground/>
-    <SpeedControl 
-      ref="speedControlRef"
-      :speed="typewriterSpeed"
-      :game-state="gameState"
-      :current-room-name="currentRoomName"
-      :paragraphs="paragraphs"
-      :dialogue-active="dialogueState.active"
-      @setSpeed="setSpeed"
-      @load="handleLoad"
-      @saved="handleSaved"
-    />
-    <TextBox 
-      :paragraphs="paragraphs" 
-      :typewriterSpeed="typewriterSpeed"
-      @typingComplete="onTypingComplete"
-    />
-    <ActionBar 
-      v-if="showActions" 
-      :actions="actions" 
-      @selected="doAction" 
-    />
+ <main class="app-shell">
+   <AnimatedBackground/>
+    <section class="app-frame">
+      <div class="toolbar">
+        <SpeedControl 
+          ref="speedControlRef"
+          :speed="typewriterSpeed"
+          :game-state="gameState"
+          :current-room-name="currentRoomName"
+          :paragraphs="paragraphs"
+          :dialogue-active="dialogueState.active"
+          @setSpeed="setSpeed"
+          @load="handleLoad"
+          @saved="handleSaved"
+        />
+      </div>
+      <div class="dialogue-card">
+        <TextBox 
+          :paragraphs="paragraphs" 
+          :typewriterSpeed="typewriterSpeed"
+          @typingComplete="onTypingComplete"
+        />
+      </div>
+      <div class="actions-row">
+      <ActionBar 
+        v-if="showActions" 
+        :actions="actions" 
+        @selected="doAction" 
+      />
+      </div>
+    </section>
   </main>
 </template>
 
 <style scoped>
-main {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-
-  display: flex;
-  flex-direction: column;
-}
-
-.flag-item, .data-item {
-  display: block;
-  margin-left: 10px;
-  color: #0f0;
-}
+    /* Minimal � layout handled in style.css */
 </style>
