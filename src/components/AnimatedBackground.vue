@@ -185,7 +185,7 @@ onMounted(() => {
   top: 0;
   bottom: 0;
   z-index: 2;
-  opacity: 0.5;
+  opacity: 1;
   -moz-animation:move-background 150s linear infinite;
   -ms-animation:move-background 150s linear infinite;
   -o-animation:move-background 150s linear infinite;
