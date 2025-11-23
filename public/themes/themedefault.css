@@ -1,0 +1,44 @@
+/* Default Theme - Variable Overrides Only
+   This file only contains variable overrides for the default theme.
+   Base styles and default variables are defined in theme-variables.css and style.css */
+
+:root {
+  /* Color System */
+  --color-bg: #2a2420;
+  --color-text: #caf5c8;
+  --color-box: rgba(60, 50, 40, 0.75);
+  --color-accent: #ffd76a;
+  --color-border: #bfa76f;
+  
+  --text-story: #fab004;
+  --text-action: #fab004;
+  
+  --text-glow: 0 0 10px rgba(255, 215, 100, 0.45);
+  --text-glow-strong: 0 0 12px rgba(255, 230, 180, 0.7);
+  --text-shadow-default: 0 0 6px rgba(255, 230, 180, 0.3);
+
+  /* Typography */
+  --font-size-story: 1.8em;
+
+  /* Layout and Decoration */
+  --shadow-glow: 0 0 25px rgba(212, 175, 55, 0.35);
+  --shadow-depth: 0 0 40px rgba(0, 0, 0, 0.6);
+
+  /* Background */
+  --bg-overlay-opacity: 0.55;
+
+  /* Pattern Background */
+  --pattern-bg: url("/themes/patterns/clouds.jpg");
+  --pattern-size: 360px 360px;
+  --pattern-opacity: 0.15;
+  
+  --actionbar-bg: url("/themes/patterns/bar.png");
+  --textbox-bg: url("/themes/patterns/texture.png");
+
+  --sky-tex: url("/themes/patterns/clouds.png");
+  --sky-speed: 300s;
+
+  /* Component Specific */
+  --actionbar-border-top: rgba(175, 197, 187, 0.658);
+  --actionbar-backdrop-blur: 5px;
+}

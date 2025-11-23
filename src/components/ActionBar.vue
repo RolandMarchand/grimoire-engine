@@ -22,6 +22,7 @@
 </script>
 
 <template>
+    
     <div id="actions">
         <template v-for="(action, index) in actions" :key="index">
             <button @click="clickButton(action)" :disabled="isDisabled">
@@ -31,36 +32,44 @@
     </div>
 </template>
 
-<style scoped>
+<style>
     #actions {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+
         display: flex;
-        justify-content: space-around;
-        align-items: baseline;
-        gap: 3em;
-        margin: 5cqh 5cqw;
+        justify-content: center;
+        align-items: center;
+        gap: var(--gap-actionbar);
+        padding: var(--padding-actionbar);
     }
 
-    button {
-        font-family: "Crimson Text", serif;
-        font-weight: 700;
-        font-size: 1.7em;
-        transition-duration: 0.4s;
-        background-color: #0000;
-        color: rgb(211, 214, 225);
+    /* Action Bar button styles - override global button styles */
+    #actions button {
+        font-family: var(--font-story);
+        font-weight: var(--font-weight-button);
+        font-size: var(--font-size-button-large);
+        transition-duration: var(--transition-slow);
+        background-color: transparent;
+        color: var(--text-action);
+        text-shadow: var(--text-shadow-default);
         border: none;
     }
 
-    button:hover {
-        color: rgb(255, 255, 255);
+    #actions button:hover {
+        color: var(--text-hover);
+        text-shadow: var(--text-glow-strong);
     }
 
-    button:active {
-        color: rgb(159, 163, 179);
-        transition-duration: 0.1s;
+    #actions button:active {
+        color: var(--text-active);
+        transition-duration: var(--transition-fast);
     }
 
-    button:disabled {
-        color: rgb(159, 163, 179);
-        transition-duration: 0.1s;
+    #actions button:disabled {
+        color: var(--text-disabled);
+        transition-duration: var(--transition-fast);
     }
 </style>

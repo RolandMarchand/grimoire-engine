@@ -80,27 +80,47 @@ onMounted(() => {
 
 <style scoped>
 #text-panel {
-  height: 100%;
+  /* Responsive sizing using clamp for better adaptability */
+  width: var(--textbox-width, clamp(320px, 70vw, 900px));
+  height: var(--textbox-height, 100%);
+  
+  padding: var(--padding-textbox, 1em);
+  
+  /* Background with CSS variables and fallbacks */
+  background-image: var(--textbox-bg, linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.20)), radial-gradient(1000px 600px at 50% 0%, rgba(34,211,238,0.04), transparent 60%));
+  background-color: var(--color-box, rgba(11,19,46,0.85));
+  background-blend-mode: overlay;
+  background-size: cover;
+  
+  color: var(--text-story, #e6edf6);
+  text-shadow: var(--text-shadow-default, none);
+  font-family: var(--font-story, "Crimson Text", serif);
+  font-size: var(--font-size-textbox, clamp(1.05rem, 1.6cqw, 1.25rem));
+  font-weight: var(--font-weight-main, 400);
+  
+  border-radius: var(--border-radius, 10px);
+  
+  box-shadow:
+    var(--shadow-textbox-inset, none),
+    var(--shadow-textbox-outer, none),
+    var(--shadow-textbox-glow, none);
+  backdrop-filter: blur(6px);
+  
   overflow-y: auto;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.20)), radial-gradient(1000px 600px at 50% 0%, rgba(34,211,238,0.04), transparent 60%), rgba(11,19,46,0.85);
-  border-radius: 10px;
   scrollbar-width: none;
   position: relative;
-  scrollbar-width: none;
 }
 
 #text-panel::-webkit-scrollbar {
   display: none;
 }
 
-
 .story-content {
-  font-family: "Crimson Text", serif;
-  font-size: clamp(1.05rem, 1.6cqw, 1.25rem);
-  font-weight: 400;
-  line-height: 1.65;
-  color: #e6edf6;
-  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--story-gap, 0.6em);
+  line-height: var(--line-height, 1.65);
+  letter-spacing: var(--letter-spacing, 0.03em);
 }
 
 .story-content p {
@@ -113,11 +133,10 @@ onMounted(() => {
 
 @keyframes blink {
   0%, 49% {
-      opacity: 1;
+    opacity: 1;
   }
-
   50%, 100% {
-      opacity: 0;
+    opacity: 0;
   }
 }
 </style>

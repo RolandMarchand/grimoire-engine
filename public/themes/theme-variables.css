@@ -1,0 +1,123 @@
+/* Theme Variables - Centralized CSS Custom Properties
+   All themeable values are defined here with default values.
+   Individual theme files only override these variables. */
+
+:root {
+  /* Color System */
+  --color-bg: #2a2420;
+  --color-text: #f5e6c8;
+  --color-box: rgba(60, 50, 40, 0.75);
+  --color-accent: #ffd76a;
+  --color-border: #bfa76f;
+  
+  --text-story: #fab004;
+  --text-action: #fab004;
+  --text-disabled: rgb(159, 163, 179);
+  --text-hover: #ffea9a;
+  --text-active: #d6a84a;
+  --text-debug: #0f0;
+  
+  --text-glow: 0 0 10px rgba(255, 215, 100, 0.45);
+  --text-glow-strong: 0 0 12px rgba(255, 230, 180, 0.7);
+  --text-shadow-default: 0 0 6px rgba(255, 230, 180, 0.3);
+
+  /* Typography */
+  --font-main: 'Cinzel', serif;
+  --font-story: 'Crimson Text', serif;
+  --font-size-base: 18px;
+  --font-size-story: 1.8em;
+  --font-size-button: 1.2em;
+  --font-size-button-large: 1.4em;
+  --font-size-textbox: 1.5em;
+  --font-size-theme-toggle: 0.7rem;
+  --font-size-speed-display: 0.95em;
+  --font-size-speed-btn: 0.9em;
+  --font-weight-main: 400;
+  --font-weight-button: 700;
+  --font-weight-speed-btn: 600;
+
+  /* Layout and Decoration */
+  --border-radius: 14px;
+  --border-radius-small: 7px;
+  --border-radius-medium: 12px;
+  --border-width: 2px;
+  --border-width-thick: 3px;
+  --border-width-thin: 1.5px;
+  
+  --padding-default: 20px;
+  --padding-small: 4px 8px;
+  --padding-medium: 0.75rem 1.25rem;
+  --padding-actionbar: 1rem 0.5rem;
+  --padding-textbox: 3cqh 6cqw;
+  
+  --gap-small: 5px;
+  --gap-medium: 6px;
+  --gap-actionbar: 3cqw;
+
+  /* Shadows */
+  --shadow-glow: 0 0 25px rgba(212, 175, 55, 0.35);
+  --shadow-depth: 0 0 40px rgba(0, 0, 0, 0.6);
+  --shadow-actionbar: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  --shadow-textbox-inset: inset 0 0 10px rgba(255, 255, 255, 0.05);
+  --shadow-textbox-outer: 0 6px 15px rgba(0, 0, 0, 0.6);
+  --shadow-textbox-glow: 0 0 25px rgba(212, 175, 55, 0.25);
+  --shadow-speed-btn-hover: 0 0 6px rgba(212, 175, 55, 0.4);
+  --shadow-debug: 0 0 12px rgba(0, 0, 0, 0.4);
+
+  /* Background */
+  --bg-overlay-opacity: 0.55;
+  --bg-actionbar-overlay: rgba(10, 15, 30, 0.7);
+  --bg-theme-toggle: rgba(0, 0, 0, 0.25);
+  --bg-theme-toggle-hover: rgba(0, 0, 0, 0.4);
+  --bg-debug: rgba(15, 23, 42, 0.6);
+  --bg-speed-btn-border: rgba(128, 128, 128, 0.4);
+  
+  --fade-duration: 1.2s;
+  --transition-fast: 0.1s;
+  --transition-normal: 0.3s;
+  --transition-slow: 0.4s;
+
+  /* Text Enhancements */
+  --line-height: 1.7;
+  --letter-spacing: 0.03em;
+
+  /* Pattern Background */
+  --pattern-bg: url("/themes/patterns/clouds.jpg");
+  --pattern-size: 360px 360px;
+  --pattern-opacity: 0.15;
+  
+  --actionbar-bg: url("/themes/patterns/bar.png");
+  --textbox-bg: url("/themes/patterns/texture.png");
+
+  --sky-tex: url("/themes/patterns/clouds.png");
+  --sky-repeat: repeat-x;
+  --sky-size: contain;
+  --sky-speed: 300s;
+  --sky-opacity: 0.5;
+
+  /* Component Specific */
+  --actionbar-border-top: rgba(175, 197, 187, 0.658);
+  --actionbar-border-top-night: rgba(191, 167, 111, 0.35);
+  --actionbar-backdrop-blur: 5px;
+  --actionbar-backdrop-blur-night: 6px;
+  
+  --speed-control-top: 12px;
+  --speed-control-right: 20px;
+  --speed-control-scale: 0.85;
+  --speed-btn-size: 28px;
+  --speed-btn-hover-scale: 1.05;
+  --speed-btn-active-scale: 0.9;
+  --speed-btn-disabled-opacity: 0.3;
+  
+  --theme-toggle-top: 1vh;
+  --theme-toggle-left: 1vw;
+  --theme-toggle-z-index: 1000;
+  
+  --z-index-background: 0;
+  --z-index-app: 1;
+  --z-index-actionbar: 900;
+  --z-index-speed-control: 1000;
+  --z-index-theme-toggle: 1000;
+  --z-index-debug: 800;
+}
+

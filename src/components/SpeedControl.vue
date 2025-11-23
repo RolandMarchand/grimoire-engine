@@ -64,54 +64,51 @@ defineExpose({
 </script>
 
 <template>
-  <div class="speed">
-    <div class="speed-controls">
-      <label class="speed-label">Speed</label>
-      <input 
-        type="range" 
-        :value="speedPercentage"
-        @input="handleSliderChange"
-        min="0"
-        max="100"
-        class="speed-slider"
-        aria-label="Adjust typing speed"
-      />
-      <div class="speed-display">
-        <span class="speed-text">{{ speedPercentage }}%</span>
-      </div>
-      
-      <SaveLoadUI
-        ref="saveLoadUIRef"
-        :game-state="gameState"
-        :current-room-name="currentRoomName"
-        :paragraphs="paragraphs"
-        :dialogue-active="dialogueActive"
-        @load="handleLoad"
-        @saved="handleSaved"
-      />
+  <div class="speed-controls">
+    <label class="speed-label">Speed</label>
+    <input 
+      type="range" 
+      :value="speedPercentage"
+      @input="handleSliderChange"
+      min="0"
+      max="100"
+      class="speed-slider"
+      aria-label="Adjust typing speed"
+    />
+    <div class="speed-display">
+      <span class="speed-text">{{ speedPercentage }}%</span>
     </div>
+    
+    <SaveLoadUI
+      ref="saveLoadUIRef"
+      :game-state="gameState"
+      :current-room-name="currentRoomName"
+      :paragraphs="paragraphs"
+      :dialogue-active="dialogueActive"
+      @load="handleLoad"
+      @saved="handleSaved"
+    />
   </div>
 </template>
 
 <style scoped>
-.speed {
-  position: absolute;
-  top: 1em;
-  right: 1em;
-}
-
 .speed-controls {
+  position: absolute;
+  top: var(--speed-control-top, 1em);
+  right: var(--speed-control-right, 1em);
   display: flex;
   align-items: center;
-  gap: 1em;
+  gap: var(--gap-small, 1em);
   padding: 0 1em;
+  z-index: var(--z-index-speed-control, 100);
+  transform: scale(var(--speed-control-scale, 1));
 }
 
 .speed-label {
-  font-family: "Crimson Text", serif;
-  font-weight: 400;
-  font-size: 1.2em;
-  color: rgb(211, 214, 225);
+  font-family: var(--font-story, "Crimson Text", serif);
+  font-weight: var(--font-weight-main, 400);
+  font-size: var(--font-size-speed-display, 1.2em);
+  color: var(--color-text, rgb(211, 214, 225));
 }
 
 .speed-slider {
@@ -129,10 +126,10 @@ defineExpose({
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: rgb(211, 214, 225);
+  background: var(--color-text, rgb(211, 214, 225));
   cursor: pointer;
   transition: all 0.3s;
-  border: 2px solid rgb(211, 214, 225);
+  border: 2px solid var(--color-text, rgb(211, 214, 225));
 }
 
 .speed-slider::-webkit-slider-thumb:hover {
@@ -146,10 +143,10 @@ defineExpose({
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: rgb(211, 214, 225);
+  background: var(--color-text, rgb(211, 214, 225));
   cursor: pointer;
   transition: all 0.3s;
-  border: 2px solid rgb(211, 214, 225);
+  border: 2px solid var(--color-text, rgb(211, 214, 225));
 }
 
 .speed-slider::-moz-range-thumb:hover {
@@ -160,10 +157,10 @@ defineExpose({
 }
 
 .speed-display {
-  font-family: "Crimson Text", serif;
-  font-weight: 400;
-  font-size: 1.2em;
-  color: rgb(211, 214, 225);
+  font-family: var(--font-story, "Crimson Text", serif);
+  font-weight: var(--font-weight-main, 400);
+  font-size: var(--font-size-speed-display, 1.2em);
+  color: var(--color-text, rgb(211, 214, 225));
   min-width: 3.5em;
   text-align: center;
   padding: 0.25em 0.5em;

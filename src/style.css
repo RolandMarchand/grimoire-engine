@@ -1,52 +1,94 @@
+/* Import theme variables - must be loaded first */
+@import url('/themes/theme-variables.css');
+
 /* Global dark theme + structured layout frame */
 :root {
-    --bg-0: #0f172a; /* slate-900 */
-    --bg-1: #0b1226; /* deeper base */
-    --panel: #0b132e; /* panel fill */
-    --panel-tint: #0e193a; /* subtle inner tint */
-    --border: #1e293b; /* slate-700 */
-    --bezel: #334155; /* slate-600 */
-    --ink: #f8fafc; /* slate-50 */
-    --ink-dim: #cbd5e1; /* slate-300 */
-    --accent: #22d3ee; /* cyan-400 */
+    /* Fallback colors if theme variables aren't loaded */
+    --bg-0: #0f172a;
+    --bg-1: #0b1226;
+    --panel: #0b132e;
+    --panel-tint: #0e193a;
+    --border: #1e293b;
+    --bezel: #334155;
+    --ink: #f8fafc;
+    --ink-dim: #cbd5e1;
+    --accent: #22d3ee;
     --shadow: 0 10px 30px rgba(0,0,0,0.50), 0 2px 10px rgba(0,0,0,0.30);
 }
 
 html, body {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-family: var(--font-main, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif);
     line-height: 1.5;
-    font-weight: 400;
+    font-weight: var(--font-weight-main, 400);
+    font-size: var(--font-size-base, 16px);
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     margin: 0;
     padding: 0;
-    /* Keep app fixed size (game feel), no page scroll */
     overflow: hidden;
     position: fixed;
     width: 100%;
     height: 100%;
-    color-scheme: light;
-    color: var(--ink);
-    /* Deep space backdrop with vignette + faint grid */
-    background: radial-gradient(1200px 800px at 50% 10%, rgba(34,211,238,0.05), transparent 60%), radial-gradient(1200px 800px at 50% 100%, rgba(124,58,237,0.08), transparent 60%), linear-gradient(var(--bg-1), var(--bg-0));
+    color-scheme: dark;
+    color: var(--color-text, var(--ink));
+    background: var(--color-bg, radial-gradient(1200px 800px at 50% 10%, rgba(34,211,238,0.05), transparent 60%), radial-gradient(1200px 800px at 50% 100%, rgba(124,58,237,0.08), transparent 60%), linear-gradient(var(--bg-1), var(--bg-0)));
+    transition: background 1s ease-in-out;
 }
 
+body {
+    position: relative;
+    z-index: var(--z-index-background, 0);
+}
+
+/* Background texture/animation layer */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-index-background, 0);
+    background-image: var(--sky-tex, none);
+    background-repeat: var(--sky-repeat, repeat-x);
+    background-size: var(--sky-size, cover);
+    opacity: var(--sky-opacity, 0.3);
+    animation: scrollClouds var(--sky-speed, 60s) linear infinite;
+    pointer-events: none;
+}
+
+@keyframes scrollClouds {
+    from { background-position-x: 0; }
+    to { background-position-x: -100%; }
+}
+
+/* Main app layer */
 #app {
+    position: relative;
+    z-index: var(--z-index-app, 1);
     width: 100vw;
     height: 100vh;
     margin: 0;
     padding: 0;
 }
 
-    /* Texture layer: faint grid for depth */
-    #app::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        opacity: 0.10;
-        background: repeating-linear-gradient( to right, transparent 0, transparent 19px, rgba(255,255,255,0.04) 20px ), repeating-linear-gradient( to bottom, transparent 0, transparent 19px, rgba(255,255,255,0.04) 20px );
-    }
+/* Texture layer: faint grid for depth */
+#app::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.10;
+    background: repeating-linear-gradient(
+        to right,
+        transparent 0,
+        transparent 19px,
+        rgba(255,255,255,0.04) 20px
+    ),
+    repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 19px,
+        rgba(255,255,255,0.04) 20px
+    );
+}
 
 /* App shell centers content with breathing room */
 .app-shell {
@@ -59,28 +101,34 @@ html, body {
 
 /* Main frame with subtle border, glow, and rounded corners */
 .app-frame {
-    width: min(1100px, 96vw);
     height: min(900px, 92vh);
     display: grid;
     grid-template-rows: auto 1fr auto;
     gap: clamp(12px, 2cqw, 18px);
     padding: clamp(14px, 2cqw, 22px);
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.08)) border-box, linear-gradient(180deg, var(--panel), var(--panel-tint)) padding-box;
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.08)) border-box,
+                linear-gradient(180deg, var(--panel), var(--panel-tint)) padding-box;
     border: 1px solid var(--border);
-    border-radius: 18px;
+    border-radius: var(--border-radius, 18px);
     box-shadow: var(--shadow);
     position: relative;
+    
+    /* Add smooth transitions */
+    transition: background var(--fade-duration, 1.2s) ease-in-out,
+                box-shadow var(--fade-duration, 1.2s) ease-in-out,
+                border-color var(--fade-duration, 1.2s) ease-in-out;
 }
 
-    /* Frame inner glow */
-    .app-frame::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 18px;
-        pointer-events: none;
-        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), inset 0 20px 80px rgba(34,211,238,0.06);
-    }
+/* Frame inner glow */
+.app-frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--border-radius, 18px);
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05),
+                inset 0 20px 80px rgba(34,211,238,0.06);
+}
 
 /* Top toolbar area */
 .toolbar {
@@ -96,45 +144,77 @@ html, body {
     position: relative;
     display: grid;
     grid-template-rows: 1fr;
-    height: clamp(300px, 55vh, 620px); /* << keeps it from dominating */
+    height: clamp(300px, 55vh, 620px);
     width: 100%;
-    /* Decorative bezel frame */
     background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.15)) padding-box;
-    border: 1px solid var(--border);
+    border: var(--border-width, 1px) solid var(--color-border, var(--border));
     border-radius: 14px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.35),
+                inset 0 1px 0 rgba(255,255,255,0.04);
     overflow: hidden;
 }
 
-    /* Extra bezel layers */
-    .dialogue-card::before,
-    .dialogue-card::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 14px;
-        pointer-events: none;
-    }
-
-    .dialogue-card::before {
-        box-shadow: inset 0 0 0 2px rgba(51,65,85,0.35); /* slate-ish inner ring */
-    }
-
-    .dialogue-card::after {
-        inset: 6px;
-        border-radius: 10px;
-        box-shadow: inset 0 0 0 1px rgba(148,163,184,0.18), inset 0 20px 60px rgba(34,211,238,0.045);
-    }
-
-/* Bottom action area spacing */
-/* Careful, can get crowded with a lot of text, no longer just 1 line when we use 5+ two-word min choices */
-.actions-row {
-    display: grid;
-    grid-auto-flow: row;
-    align-items: start;
+/* Extra bezel layers */
+.dialogue-card::before,
+.dialogue-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    pointer-events: none;
 }
 
-/* Utility: dim text color for metadata if needed */
+.dialogue-card::before {
+    box-shadow: inset 0 0 0 2px rgba(51,65,85,0.35);
+}
+
+.dialogue-card::after {
+    inset: 6px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgba(148,163,184,0.18),
+                inset 0 20px 60px rgba(34,211,238,0.045);
+}
+
+/* Action Bar Styling */
+#actions {
+    background-image: var(--actionbar-bg, none);
+    background-repeat: repeat-x;
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: multiply;
+    backdrop-filter: blur(var(--actionbar-backdrop-blur, 0));
+    border-top: var(--border-width-thick, 2px) solid var(--actionbar-border-top, transparent);
+    box-shadow: var(--shadow-actionbar, none);
+    z-index: var(--z-index-actionbar, 10);
+}
+
+/* Button Styling */
+button {
+    font-family: var(--font-main, inherit);
+    font-weight: var(--font-weight-button, 700);
+    font-size: var(--font-size-button, 1em);
+    color: var(--text-action, var(--ink));
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color var(--transition-normal, 0.3s) ease;
+}
+
+button:hover {
+    color: var(--color-accent, var(--accent));
+}
+
+button:active {
+    color: var(--text-active, var(--ink-dim));
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: var(--text-disabled, var(--ink-dim));
+}
+
+/* Utility classes */
 .text-dim {
     color: var(--ink-dim);
 }
