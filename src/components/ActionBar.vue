@@ -34,16 +34,12 @@
 
 <style>
     #actions {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-
         display: flex;
         justify-content: center;
         align-items: center;
         gap: var(--gap-actionbar);
         padding: var(--padding-actionbar);
+        border-radius: 10px;
     }
 
     /* Action Bar button styles - override global button styles */
@@ -71,5 +67,11 @@
     #actions button:disabled {
         color: var(--text-disabled);
         transition-duration: var(--transition-fast);
+    }
+
+    @media (max-width: 768px) {
+        #actions {
+            flex-direction: column;
+        }
     }
 </style>

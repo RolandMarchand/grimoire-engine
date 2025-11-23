@@ -40,4 +40,10 @@
   --actionbar-border-top: rgba(191, 167, 111, 0.35);
   --actionbar-backdrop-blur: 6px;
   --bg-actionbar-overlay: rgba(10, 15, 30, 0.7);
+
+    /* Panel colors for dark theme */
+  --panel: rgba(15, 25, 50, 0.95);
+  --panel-tint: rgba(10, 15, 35, 0.98);
+  --border: rgba(100, 120, 180, 0.4);
+  --shadow: 0 10px 40px rgba(0,0,0,0.7), 0 2px 15px rgba(0,0,0,0.5);
 }
