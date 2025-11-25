@@ -80,6 +80,14 @@
                   >
                     🗑️
                   </button>
+                  <button 
+                    @click="exportSlot(`slot${slotNum}`)" 
+                    :disabled="!manualSaveMetadata[slotNum - 1]"
+                    class="export-button"
+                    title="Export save"
+                  >
+                    Export
+                  </button>
                 </div>
               </div>
             </div>
@@ -114,6 +122,7 @@ const emit = defineEmits<{
 const showModal = ref(false);
 const autoSaveMetadata = ref<SaveMetadata | null>(null);
 const manualSaveMetadata = ref<Array<SaveMetadata | null>>([null, null, null]);
+
 
 const toggleModal = () => {
   showModal.value = !showModal.value;
@@ -181,6 +190,22 @@ const loadSlot = async (slotId: string) => {
     alert('Failed to load game. Please try again.');
   }
 };
+
+const exportSlot = async (slotId: string) => {
+  try {
+    const saveData = await saveManager.loadGame(slotId);
+    if (saveData){
+      //if returns save data, then call the manager method to 
+      // do the appropriate checks and write to disk  
+      await saveManager.exportSave(saveData);
+    }
+    
+  } catch(error){
+    console.error('Failed to export save:', error);
+    alert('Failed to export selected save. Please try again.')
+  }
+}
+
 
 const deleteSlot = async (slotId: string) => {
   if (confirm('Are you sure you want to delete this save?')) {
@@ -431,7 +456,9 @@ onMounted(() => {
 
 .save-button,
 .load-button,
-.delete-button {
+.delete-button,
+.export-button,
+.import-button {
   font-family: var(--font-main, "Crimson Text", serif);
   font-weight: var(--font-weight-button, 600);
   padding: 0.5em 1em;
