@@ -26,10 +26,12 @@ class IndexedDBManager {
   private dbPromise: Promise<IDBDatabase> | null = null;
 
   private openDB(): Promise<IDBDatabase> {
+    //if this dbPromise not null, return instance is open
     if (this.dbPromise) {
       return this.dbPromise;
     }
 
+    //else open the db conn
     this.dbPromise = new Promise((resolve, reject) => {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
 
@@ -80,6 +82,25 @@ class IndexedDBManager {
     } catch (error) {
       console.error('Error loading game:', error);
       return null;
+    }
+  }
+
+  async exportSave(save: SaveData): Promise<void> {
+    try {
+    const jsonString = JSON.stringify(save, null, 2);
+    
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Grimoire-Demo-save-${Date.now()}.json`; // Filename
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    } catch (error) {
+      console.error('An error ocurred while downloading save:', error);
     }
   }
 
