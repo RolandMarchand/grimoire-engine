@@ -16,6 +16,7 @@
           </div>
 
           <div class="modal-body">
+
             <!-- Auto-Save Section -->
             <div class="save-section">
               <h3>Auto-Save</h3>
@@ -43,6 +44,13 @@
             <!-- Manual Saves Section -->
             <div class="save-section">
               <h3>Manual Saves</h3>
+              <input 
+                type="file" 
+                ref="inputFile"
+                @change="importFile"
+                accept=".json"
+                style="display: none"
+              />
               <div 
                 v-for="slotNum in [1, 2, 3]" 
                 :key="slotNum" 
@@ -88,6 +96,14 @@
                   >
                     Export
                   </button>
+                  <button
+                  @click="triggerFileInput(`slot${slotNum}`)" 
+                    :disabled="dialogueActive"
+                    class="load-button"
+                    title="Import save"
+                  >
+                    Import
+                  </button>
                 </div>
               </div>
             </div>
@@ -122,6 +138,8 @@ const emit = defineEmits<{
 const showModal = ref(false);
 const autoSaveMetadata = ref<SaveMetadata | null>(null);
 const manualSaveMetadata = ref<Array<SaveMetadata | null>>([null, null, null]);
+const inputFile = ref<HTMLInputElement | null>(null);
+const selectedSlot = ref<string | null>(null);
 
 
 const toggleModal = () => {
@@ -133,6 +151,11 @@ const toggleModal = () => {
 
 const closeModal = () => {
   showModal.value = false;
+};
+
+const triggerFileInput = (slotId: string) => {
+  selectedSlot.value = slotId;
+  inputFile.value?.click();
 };
 
 const loadMetadata = async () => {
@@ -190,6 +213,30 @@ const loadSlot = async (slotId: string) => {
     alert('Failed to load game. Please try again.');
   }
 };
+
+const importFile = async (event: Event) => {
+  try{
+    const target = event.target as HTMLInputElement;
+    const inputFile = target.files?.[0];
+    const slotid = selectedSlot.value; 
+    if (inputFile && slotid){
+      const makeSave = await saveManager.importGame(inputFile, slotid);
+      if (makeSave){
+        await loadMetadata();
+        alert(`Game save imported to ${slotid.toUpperCase()}!`);
+      }
+    } else
+    {
+      console.error('Failed to import save: SlotID failed to be retrieved');
+      alert('Failed to retrieve SlotID')
+    }
+  } catch(error){
+    console.error('Failed to import save:', error);
+    alert('Failed to import save. Please make sure save file is in proper format.')
+  }
+  
+  
+}
 
 const exportSlot = async (slotId: string) => {
   try {
