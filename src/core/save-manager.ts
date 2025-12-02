@@ -104,6 +104,25 @@ class IndexedDBManager {
     }
   }
 
+  async importGame(inputFile: File, saveId: string): Promise<boolean> {
+    //convert the file into a parsed json (everything but the saveID of the imported file)
+    try{
+      const text = await inputFile.text();
+      const save = JSON.parse(text);
+
+      save.slotId = saveId;
+
+      //send the parsed file (saved as a SaveData object) to saveGame
+      await this.saveGame(save as SaveData);
+      return true;
+
+    } catch (error) {
+      console.error('Error importing save:', error);
+      return false;
+    }
+    
+  }
+
   async getSaveMetadata(slotId: string): Promise<SaveMetadata | null> {
     try {
       const saveData = await this.loadGame(slotId);
