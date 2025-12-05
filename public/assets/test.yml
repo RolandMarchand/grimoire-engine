@@ -1,35 +1,81 @@
-version: 1
+version: 5
 
-spawn: cottage
+spawn: fountain
 
 characters:
   wizard:
     name: "Aldric"
     color: "#9b59b6"
   
+  tradeswoman:
+    name: "Emelda"
+    color: "#BEFD73"
+
   player:
     name: "Traveler"
     color: "#3498db"
-
+  
 rooms:
   cottage:
     shortDescription: "A cozy stone cottage"
-    longDescription: "A small cottage with a thatched roof and warm fireplace. An old wizard sits by the fire."
+    longDescription: "A small cottage with a thatched roof and a warm fireplace. An old wizard sits by the fire."
     actions:
       "Talk to wizard": 
         dialogue: wizardMeeting
       "Exit to garden": 
-        print: "You step outside into the garden."
-        go: garden
-
+        - print: "You step outside into the garden."
+        - go: garden
+  
   garden:
-    shortDescription: "An overgrown garden"
-    longDescription: "Wild roses climb the ancient stone walls. A mysterious archway stands among the tangled vines."
+    shortDescription: "A small garden with a stone archway"
+    longDescription: "You enter a quaint green garden encompasses the front of the cottage. You can see an odd stone archway to the side of the garden."
     actions:
-      "Return to cottage":
-        print: "You return to the cottage."
-        go: cottage
-      "Examine archway": "examineArchway"
+      "Enter the cottage": 
+        - print: "You enter the cottage"
+        - go: cottage
+      "Examine archway": examineArchway
+      "Exit to fountain":
+        - print: "You head back to the fountain."
+        - go: fountain
+  
+  fountain:
+    shortDescription: "The city fountain"
+    longDescription: "The city fountain stands at the heart of the city."
+    actions:
+      "Examine Fountain": examineFountain
+      "Go to cottage":
+        - print: "You head toward the cottage"
+        - go: garden
+      "Go to market":
+        - print: "You enter the market"
+        - go: market
+      "Go to outer forest": leaveCity
+  
+  forest:
+    shortDescription: "The great forest"
+    longDescription: "You enter the great forest, with trees that stand tall above any building you have ever seen within the walls of the city."
+    actions:
+      "Search the forest": findCave
+      "Head back to the city":
+        - print: "You leave the forest back to the safety of the city"
+        - go: fountain
+  
+  market:
+    shortDescription: "A busy market"
+    longDescription: "You enter the bustling marketplace of busy stalls all selling a variety of goods that stand more than you could ever need."
+    actions:
+      "Speak to merchant":
+        dialogue: ropeMerchant
+      "Head back to fountain":
+        - print: "You head back to the fountain"
+        - go: fountain
+  
+  demoEnd:
+    shortDescription: "The End"
+    longDescription: "Although this may be the beginning, this marks the end of the demo"
+    actions: 
+      "Thank you for playing":
+        print: "Thank you for playing!"
 
 events:
   examineArchway:
@@ -39,121 +85,215 @@ events:
       failed:
         print: "The archway seems dormant. Perhaps it requires magic to activate."
     print: "The archway begins to glow with magical energy!"
+  
+  examineFountain:
+    chain:
+      - print: "You look into the water of the fountain..."
+      - print: "...and spot a shining silver coin at the bottom!"
+      - print: "You pick up the coin. Perhaps it will serve you well..."
+    callFunctions:
+      addItem: [coin]        
+  
+  leaveCity:
+    check:
+      test: hasFlag
+      arguments: [adventure_started]
+      failed:
+        print: "You pause before you reach the gate. Why would you ever want to leave the city?"
+    chain:
+      - print: "You take your first ever steps outside the safety of the great city..."
+      - go: forest
+  
+  findCave:
+    check:
+      test: hasItem
+      arguments: [rope]
+      failed:
+        print: "As you search the forest you spot the entrance to a cave. However, a sheer descent in the cave stops you from progressing. Perhaps if you had a rope to help you down you might see where it leads..."
+    callFunctions:
+      removeItem: [rope]
+    chain:
+      - print: "As you search the forest you spot the entrance to a cave. Using your rope allows you to descend the sheer drop into the cave. Perhaps this is where you need to go to truly start your adventure..."
+      - go: demoEnd
 
 dialogues:
   wizardMeeting:
-    start: greeting
+    start: start_check
     nodes:
-      greeting:
-        message:
-          speaker: wizard
-          text: "[i]Well, well...[/i] A visitor! What brings you to my humble cottage?"
-          choices:
-            - ["Who are you?", introduction]
-            - ["I need help", helpRequest]
-            - ["Just passing through", farewell]
-
-      introduction:
-        message:
-          speaker: wizard
-          text: "I am Aldric the Ancient, keeper of arcane knowledge and guardian of this enchanted garden."
-          choices:
-            - ["Tell me about the garden", gardenPath]
-            - ["Can you teach me magic?", magicHelp]
-            - ["I should go", farewell]
-
-      helpRequest:
+      start_check:
         branch:
-          condition: hasItem
-          true: alreadyHasBook
-          false: offerHelp
+          condition: hasItem:spellbook
+          true: reinforce
+          false: hello
 
-      offerHelp:
+      hello:
         message:
           speaker: wizard
-          text: "Hmm, you seem genuine. Perhaps I can assist you. What do you seek?"
+          text: "[i]Welcome[/i], traveler..."
           choices:
-            - ["Magic training", magicHelp]
-            - ["Knowledge of the garden", gardenPath]
-            - ["Nothing, thank you", farewell]
-
-      alreadyHasBook:
+            - ["Continue", prophecy]
+        
+      prophecy:
         message:
           speaker: wizard
-          text: "I see you already possess my spellbook. Use it wisely, young one."
+          text: "I was expecting your arrival for [i]quite some time[/i], as it was foretold to me in [b]prophecy[/b]."
           choices:
-            - ["Tell me more about it", bookExplanation]
-            - ["Goodbye", farewell]
-
-      bookExplanation:
-        message:
-          speaker: wizard
-          text: "The spellbook contains ancient incantations. The garden archway will respond to your magical touch now."
-          next: farewell
-
-      magicHelp:
-        sequence:
-          - message:
-              speaker: wizard
-              text: "Magic requires dedication and the right tools. I sense potential in you."
-
-          - message:
-              speaker: wizard
-              text: "Take this ancient spellbook. It contains the basics you'll need."
-              choices:
-                - text: "Thank you!"
-                  next: receiveBook
-                  events:
-                    callFunctions:
-                      addItem: ["spellbook"]
-                      setFlag: ["receivedBook", "true"]
-
-                - ["I'm not ready", notReady]
-
-      receiveBook:
-        message:
-          speaker: wizard
-          text: "Use it well. The garden archway may now respond to your presence."
-          choices:
-            - ["I'll practice carefully", farewell]
-
-      notReady:
-        message:
-          speaker: wizard
-          text: "Very well. Return when you feel prepared."
-          next: farewell
-
-      gardenPath:
-        message:
-          speaker: wizard
-          text: "Ah, the garden holds many secrets. The archway is particularly interesting..."
-          choices:
-            - text: "What does it do?"
-              next: archwayCond
-              condition: hasFlag
-              else: archwayBasic
-
-            - ["Maybe another time", greeting]
-
-      archwayBasic:
-        message:
-          speaker: wizard
-          text: "I cannot reveal its secrets to just anyone. Perhaps if you were a student of magic..."
-          choices:
-            - ["Can you teach me?", magicHelp]
-            - ["I understand", farewell]
-
-      archwayCond:
-        message:
-          speaker: wizard
-          text: "Since you possess the spellbook, I can tell you - it's a portal to the ancient library. Touch it with your magical focus."
-          choices:
-            - ["Fascinating!", farewell]
-
-      farewell:
+            - ["Continue", curiosity]
+        
+      curiosity:
         message:
           speaker: player
-          text: "Goodbye, Aldric. Thank you for your time."
-          next: exit
+          text: "A prophecy?"
+          choices:
+            - ["Continue", exposition]
+        
+      exposition:
+        message:
+          speaker: wizard
+          text: "Yes my child! It was told to me [i]ages ago[/i] that you are to leave this city and make your way through the forests beyond to [b]a land untold[/b]!"
+          choices:
+            - ["Continue", plead]
+        
+      plead:
+        message:
+          speaker: wizard
+          text: "Will you place your trust in me, young one? [i]Take up my quest[/i], [u]leave this city[/u] and [i]fulfill my prophecy[/i]!"
+          choices:
+            - ["Yes", agree]
+            - ["No", decline]
 
-      exit: null
+      agree:
+        message:
+          speaker: player
+          text: "O-okay, I'll do it! What shall I do?"
+          choices:
+            - ["Continue", celebration]
+
+      decline: 
+        message:
+          speaker: player
+          text: "I-i'm not so sure about this. I think you have the wrong person."
+          choices:
+            - ["Continue", encourage]
+
+      celebration:
+        message:
+          speaker: wizard
+          text: "Wonderful!"
+          choices:
+            - ["Continue", gift]
+        
+      encourage: 
+        message:
+          speaker: wizard
+          text: "I ensure you my child, you are [i]exactly[/i] the person I am certain must complete this quest. No else will suffice!"
+          choices:
+            - ["Continue", gift]
+
+      gift:
+        message:
+          speaker: wizard
+          text: "Please, take this tome, you may test it on the archway in the garden out front."
+          choices:
+            - ["Continue", receive_book]
+      
+      receive_book:
+        events:
+          - print: "[i]The Wizard gives you an old, bound book. A slight glow of gold emanates from the pages.[/i]"
+          - callFunctions:
+              addItem: [spellbook]
+          - callFunctions:
+              setFlag: ["adventure_started", "true"]
+        next: sendoff
+      
+      sendoff:
+        message:
+          speaker: wizard
+          text: "Head out the front gates of the city and through the forest! Although I would recommend you [i]gather goods at the market[/i] before you depart."
+          next: ~
+      
+      reinforce:
+        message: 
+          speaker: wizard
+          text: "Go on now! Make your way through the forest, but remember you may want to stock up on goods before you leave."
+          next: ~
+
+  ropeMerchant:
+    start: welcome
+    nodes: 
+      welcome:
+        message:
+          speaker: tradeswoman
+          text: "[i]Welcome, welcome[/i]! You have coin, you're in the right place!"
+          choices:
+            - ["Continue", check_knowledge]
+        
+      check_knowledge:
+        branch:
+          condition: hasItem:spellbook
+          true: recognize
+          false: shop
+
+      recognize:
+        message:
+          speaker: tradeswoman
+          text: "Are you that adventurer Aldric has been raving about in his [i]prophecy[/i]?  If so, I would recommend you best get some rope. [b]Every adventurer needs a rope[/b]!"
+          choices:
+            - ["Continue", shop]
+        
+      shop:
+        message:
+          speaker: tradeswoman
+          text: "What can I get for ya?"
+          choices:
+            - ["Leave merchant", goodbye]
+            - ["Buy rope", check_rope]
+      
+      check_rope:
+        branch:
+          condition: hasItem:rope
+          true: sold
+          false: check_coin
+
+      check_coin:
+        branch:
+          condition: hasItem:coin
+          true: buy_rope
+          false: no_coin
+          
+      buy_rope:
+        events:
+          - print: "[i]You give the tradeswoman the silver coin you found in the fountain.[/i]"
+          - callFunctions:
+              removeItem: [coin]
+              addItem: [rope]
+        next: purchase
+
+      no_coin:
+        message:
+          speaker: tradeswoman
+          text: "I'm sorry but I can't be giving rope out for nothing! I at least need [b]a bit of silver[/b]."
+          choices:
+            - ["Leave merchant", goodbye]
+
+      sold:
+        message:
+          speaker: tradeswoman
+          text: "You bought out me whole stock already! It will take me at least a week before I can get any more I got a business to run here."
+          choices:
+            - ["Leave merchant", goodbye]
+            - ["Keep browsing", shop]
+
+      purchase:
+        message:
+          speaker: tradeswoman
+          text: "Fine piece of rope that is! Great for [b]wrapping and rappelling[/b]."
+          choices:
+            - ["Leave merchant", goodbye]
+            - ["Keep browsing", shop]
+
+      goodbye:
+        message:
+          speaker: tradeswoman
+          text: "Come back any time!"
+          next: ~
