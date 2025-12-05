@@ -38,7 +38,7 @@ type MessageNode = {
     speaker: string;
     text: string;
     choices?: Array<DialogueChoice>;
-    next?: string;
+    next?: string | null;
 };
 
 type BranchNode = {
@@ -51,7 +51,7 @@ type DialogueNode =
     | { message: MessageNode }
     | { branch: BranchNode }
     | { sequence: Array<string | DialogueNode> }
-    | { events: EventChain; next?: string }
+    | { events: EventChain; next?: string | null }
     | null;
 
 type Dialogue = {
@@ -122,7 +122,7 @@ const MessageNode: z.ZodType<MessageNode> = z.lazy(() => z.object({
     speaker: z.string().trim().min(1),
     text: z.string().trim().min(1),
     choices: z.array(DialogueChoice).optional(),
-    next: z.string().trim().min(1).optional(),
+    next: z.string().trim().min(1).nullable().optional(),
 }).strict());
 
 const BranchNode = z.object({
@@ -135,7 +135,7 @@ const DialogueNode: z.ZodType<DialogueNode> = z.lazy(() => z.union([
     z.object({ message: MessageNode }).strict(),
     z.object({ branch: BranchNode }).strict(),
     z.object({ sequence: z.array(z.union([z.string().trim().min(1), DialogueNode])) }).strict(),
-    z.object({ events: EventChain, next: z.string().trim().min(1).optional() }).strict(),
+    z.object({ events: EventChain, next: z.string().trim().min(1).nullable().optional() }).strict(),
     z.null(),
 ]));
 
@@ -178,9 +178,11 @@ const Dialogue = z.object({
                         }
                     }
                 });
-            } else if (msg.next) {
+            } else if (msg.next !== undefined) {
                 nodesWithExits.add(nodeName);
-                referencedNodes.add(msg.next);
+                if (msg.next !== null) {
+                    referencedNodes.add(msg.next);
+                }
             }
         }
 
@@ -202,9 +204,11 @@ const Dialogue = z.object({
         }
 
         if ('events' in node) {
-            if (node.next) {
+            if (node.next !== undefined) {
                 nodesWithExits.add(nodeName);
-                referencedNodes.add(node.next);
+                if (node.next !== null) {
+                    referencedNodes.add(node.next);
+                }
             }
         }
     };
