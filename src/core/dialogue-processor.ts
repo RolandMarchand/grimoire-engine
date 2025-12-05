@@ -186,9 +186,10 @@ export class DialogueProcessor {
     }
 
     private async processBranch(node: BranchNode): Promise<DialogueState> {
+        const condition = node.condition.split(":");
         const result = await this.conditionChecker.evaluateCheck({
-            test: node.condition,
-            arguments: []
+            test: condition[0],
+            arguments: [condition[1]]
         });
 
         const nextNode = result ? node.true : node.false;
